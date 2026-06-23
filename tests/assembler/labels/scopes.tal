@@ -1,0 +1,7 @@
+|0100
+@parent
+    #12 ,&child STR
+&child
+    $1
+@parent2
+    #34 ,parent/child STR

@@ -1,0 +1,4 @@
+|0100
+    ?{ INC }
+    !{ POP }
+    { ADD JMP2r } STH2r JSR2

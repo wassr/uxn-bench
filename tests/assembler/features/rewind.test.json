@@ -1,0 +1,15 @@
+{
+  "name": "Assembler Cursor Rewind",
+  "type": "assembler",
+  "capabilities": [
+    "assembler",
+    "assembler/pad-label"
+  ],
+  "run": {
+    "input": "rewind.tal"
+  },
+  "verify": {
+    "type": "size_match",
+    "expected_size": 3
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Assembler Runes",
+  "type": "assembler",
+  "capabilities": [
+    "assembler",
+    "assembler/jmi",
+    "assembler/jcn",
+    "assembler/runes"
+  ],
+  "run": {
+    "input": "runes.tal"
+  },
+  "verify": {
+    "type": "size_match",
+    "expected_size": 15
+  }
+}

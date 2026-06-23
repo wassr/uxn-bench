@@ -1,0 +1,14 @@
+{
+  "name": "Assembler Opcode Suffixes",
+  "type": "assembler",
+  "capabilities": [
+    "assembler"
+  ],
+  "run": {
+    "input": "op_suffixes.tal"
+  },
+  "verify": {
+    "type": "size_match",
+    "expected_size": 16
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Stack Overflow",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu/trap-on-stack"
+  ],
+  "run": {
+    "input": "stack_overflow.tal"
+  },
+  "verify": {
+    "type": "error_match",
+    "expected_stderr": "overflow"
+  }
+}

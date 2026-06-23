@@ -1,0 +1,13 @@
+|0100
+@test
+    #12 #80 STZ
+    #80 LDZ
+    #12 EQU ,&ok1 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok1
+    #3456 #82 STZ2
+    #82 LDZ2
+    #3456 EQU2 ,&ok2 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok2
+    #4f #18 DEO #4b #18 DEO #80 #0f DEO

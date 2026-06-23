@@ -1,0 +1,15 @@
+{
+  "name": "Jump JSR",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "varvara/console"
+  ],
+  "run": {
+    "input": "jsr.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "OK"
+  }
+}

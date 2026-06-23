@@ -1,0 +1,14 @@
+{
+  "name": "Division by Zero",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu/trap-on-div-zero"
+  ],
+  "run": {
+    "input": "div_zero.tal"
+  },
+  "verify": {
+    "type": "error_match",
+    "expected_stderr": "division by zero"
+  }
+}

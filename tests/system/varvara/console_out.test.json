@@ -1,0 +1,11 @@
+{
+  "name": "Console Output",
+  "type": "interpreter",
+  "run": {
+    "input": "console_out.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "Hello\n"
+  }
+}

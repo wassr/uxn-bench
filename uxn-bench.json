@@ -1,0 +1,105 @@
+{
+  "defaults": {
+    "assembler": "uxnasm",
+    "interpreter": "uxn2"
+  },
+  "assemblers": {
+    "uxnasm": {
+      "cmd": "uxnasm {input} {output}",
+      "capabilities": [
+        "assembler",
+        "assembler/jsi",
+        "assembler/jcn",
+        "assembler/jmi",
+        "assembler/runes"
+      ],
+      "state_extractors": ["assembler/basic"]
+    },
+    "drifblim": {
+      "cmd": "drifblim {input} {output}",
+      "capabilities": [
+        "assembler",
+        "assembler/jsi",
+        "assembler/jcn",
+        "assembler/jmi",
+        "assembler/runes",
+        "assembler/pad-label",
+        "assembler/lambda"
+      ],
+      "state_extractors": ["assembler/basic"]
+    },
+    "python-minimal": {
+      "cmd": "python3 impls/python-minimal/asm.py {input} {output}",
+      "capabilities": [
+        "assembler",
+        "assembler/jsi",
+        "assembler/jcn",
+        "assembler/jmi",
+        "assembler/runes",
+        "assembler/lambda"
+      ],
+      "state_extractors": ["assembler/basic"]
+    }
+  },
+  "interpreters": {
+    "uxncli": {
+      "cmd": "uxncli {rom}",
+      "capabilities": [
+        "cpu",
+        "cpu/trap-on-div-zero",
+        "cpu/trap-on-stack",
+        "varvara/system",
+        "varvara/console",
+        "varvara/file",
+        "varvara/datetime"
+      ],
+      "state_extractors": ["varvara/console", "varvara/system", "varvara/file"]
+    },
+    "uxn2": {
+      "cmd": "uxn2 {rom}",
+      "capabilities": [
+        "cpu",
+        "cpu/wrap",
+        "cpu/stack-wrap",
+        "varvara/system",
+        "varvara/console",
+        "varvara/file",
+        "varvara/datetime",
+        "varvara/screen",
+        "varvara/audio",
+        "varvara/controller",
+        "varvara/mouse"
+      ],
+      "state_extractors": ["varvara/console", "varvara/system", "varvara/file"]
+    },
+    "uxnemu": {
+      "cmd": "uxnemu {rom}",
+      "capabilities": [
+        "cpu",
+        "cpu/wrap",
+        "cpu/stack-wrap",
+        "varvara/system",
+        "varvara/console",
+        "varvara/screen",
+        "varvara/audio",
+        "varvara/controller",
+        "varvara/mouse",
+        "varvara/file",
+        "varvara/datetime"
+      ],
+      "state_extractors": ["varvara/console", "varvara/system", "varvara/file"]
+    },
+    "python-minimal": {
+      "cmd": "python3 impls/python-minimal/vm.py {rom} --dump-on-halt {dump_file}",
+      "capabilities": [
+        "cpu",
+        "cpu/wrap",
+        "cpu/stack-wrap",
+        "cpu/coredump",
+        "varvara/system",
+        "varvara/console"
+      ],
+      "state_extractors": ["varvara/console", "varvara/system", "cpu/coredump"]
+    }
+  }
+}

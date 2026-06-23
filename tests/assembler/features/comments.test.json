@@ -1,0 +1,14 @@
+{
+  "name": "Assembler Comments",
+  "type": "assembler",
+  "capabilities": [
+    "assembler"
+  ],
+  "run": {
+    "input": "comments.tal"
+  },
+  "verify": {
+    "type": "size_match",
+    "expected_size": 2
+  }
+}

@@ -1,0 +1,6 @@
+|0100
+@test
+&target
+    #12
+$90
+    ,&target JMP

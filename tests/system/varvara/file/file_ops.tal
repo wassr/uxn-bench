@@ -1,0 +1,34 @@
+|0100
+@test
+    ( Write a temp file and read it )
+    ;&filename .File/name DEO2
+    #0005 .File/length DEO2
+    ;&write-data .File/write DEO2
+    
+    ( Check success register has 5 )
+    .File/success DEI2
+    #0005 EQU2 ,&ok1 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok1
+    ( Close and re-open file for reading )
+    ;&filename .File/name DEO2
+    #0005 .File/length DEO2
+    ;&read-buf .File/read DEO2
+    
+    ( Check content is matched )
+    ;&read-buf LDA2 ;&write-data LDA2 EQU2 ,&ok2 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok2
+    ( Delete the file )
+    #01 .File/delete DEO
+    .File/success DEI2
+    #0001 EQU2 ,&ok3 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok3
+    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    
+&filename "test.txt 00
+&write-data "hello
+&read-buf $5
+
+|a0 @File [ &vector $2 &success $2 &stat $2 &delete $1 &append $1 &name $2 &length $2 &read $2 &write $2 ]

@@ -1,0 +1,15 @@
+{
+  "name": "Assembler Label Padding",
+  "type": "assembler",
+  "capabilities": [
+    "assembler",
+    "assembler/pad-label"
+  ],
+  "run": {
+    "input": "pad_lab.tal"
+  },
+  "verify": {
+    "type": "size_match",
+    "expected_size": 262
+  }
+}

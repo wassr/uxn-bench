@@ -1,0 +1,16 @@
+{
+  "name": "File Operations",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "varvara/file",
+    "varvara/console"
+  ],
+  "run": {
+    "input": "file_ops.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "OK"
+  }
+}

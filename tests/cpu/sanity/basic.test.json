@@ -1,0 +1,11 @@
+{
+  "name": "Basic Sanity",
+  "type": "interpreter",
+  "run": {
+    "input": "basic.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "OK"
+  }
+}

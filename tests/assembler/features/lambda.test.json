@@ -1,0 +1,15 @@
+{
+  "name": "Assembler Lambdas",
+  "type": "assembler",
+  "capabilities": [
+    "assembler",
+    "assembler/lambda"
+  ],
+  "run": {
+    "input": "lambda.tal"
+  },
+  "verify": {
+    "type": "size_match",
+    "expected_size": 15
+  }
+}

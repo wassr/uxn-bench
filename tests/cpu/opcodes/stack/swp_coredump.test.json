@@ -1,0 +1,13 @@
+{
+  "name": "SWP (coredump)",
+  "type": "interpreter",
+  "capabilities": ["cpu", "cpu/coredump"],
+  "run": {
+    "input": "swp_coredump.tal"
+  },
+  "verify": {
+    "type": "coredump",
+    "wst": [52, 18],
+    "wst_ptr": 2
+  }
+}

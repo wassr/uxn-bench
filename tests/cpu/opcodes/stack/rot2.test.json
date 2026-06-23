@@ -1,0 +1,15 @@
+{
+  "name": "Stack ROT2",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "varvara/console"
+  ],
+  "run": {
+    "input": "rot2.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "OK"
+  }
+}

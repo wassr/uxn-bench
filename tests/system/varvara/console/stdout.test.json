@@ -1,0 +1,15 @@
+{
+  "name": "Console Stdout",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "varvara/console"
+  ],
+  "run": {
+    "input": "stdout.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "Hello\n"
+  }
+}

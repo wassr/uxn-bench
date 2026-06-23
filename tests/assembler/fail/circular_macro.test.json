@@ -1,0 +1,11 @@
+{
+  "name": "Circular Macro (Segfault)",
+  "type": "assembler",
+  "run": {
+    "input": "circular_macro.tal"
+  },
+  "verify": {
+    "type": "error_match",
+    "expected_stderr": ""
+  }
+}

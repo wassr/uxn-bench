@@ -1,0 +1,11 @@
+{
+  "name": "Duplicate Macro Failure",
+  "type": "assembler",
+  "run": {
+    "input": "duplicate_macro.tal"
+  },
+  "verify": {
+    "type": "error_match",
+    "expected_stderr": "Macro duplicate"
+  }
+}

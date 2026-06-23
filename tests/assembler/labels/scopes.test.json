@@ -1,0 +1,11 @@
+{
+  "name": "Label Scoping",
+  "type": "assembler",
+  "run": {
+    "input": "scopes.tal"
+  },
+  "verify": {
+    "type": "binary_match",
+    "expected_rom": "scopes.expected.rom"
+  }
+}

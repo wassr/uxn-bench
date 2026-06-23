@@ -1,0 +1,14 @@
+{
+  "name": "Assembler Relative Padding",
+  "type": "assembler",
+  "capabilities": [
+    "assembler"
+  ],
+  "run": {
+    "input": "pad_rel.tal"
+  },
+  "verify": {
+    "type": "size_match",
+    "expected_size": 6
+  }
+}

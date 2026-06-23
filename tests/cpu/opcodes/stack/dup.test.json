@@ -1,0 +1,15 @@
+{
+  "name": "Stack DUP",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "varvara/console"
+  ],
+  "run": {
+    "input": "dup.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "OK"
+  }
+}

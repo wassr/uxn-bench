@@ -1,0 +1,13 @@
+{
+  "name": "ADD (coredump)",
+  "type": "interpreter",
+  "capabilities": ["cpu", "cpu/coredump"],
+  "run": {
+    "input": "add_coredump.tal"
+  },
+  "verify": {
+    "type": "coredump",
+    "wst": [70],
+    "wst_ptr": 1
+  }
+}

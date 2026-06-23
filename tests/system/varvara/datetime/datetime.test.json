@@ -1,0 +1,16 @@
+{
+  "name": "Datetime Device Read",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "varvara/datetime",
+    "varvara/console"
+  ],
+  "run": {
+    "input": "datetime.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "OK"
+  }
+}

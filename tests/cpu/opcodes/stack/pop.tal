@@ -1,0 +1,7 @@
+|0100
+@test
+    #11 #22 POP
+    #11 EQU ,&ok JCN
+    #46 #18 DEO #01 #0f DEO
+&ok
+    #4f #18 DEO #4b #18 DEO #80 #0f DEO

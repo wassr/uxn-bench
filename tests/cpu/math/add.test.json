@@ -1,0 +1,12 @@
+{
+  "name": "CPU Math Output",
+  "capabilities": ["cpu"],
+  "type": "interpreter",
+  "run": {
+    "input": "add.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "OK"
+  }
+}

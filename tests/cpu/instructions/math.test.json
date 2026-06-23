@@ -1,0 +1,11 @@
+{
+  "name": "Math Operations",
+  "type": "interpreter",
+  "run": {
+    "input": "math.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "OK"
+  }
+}

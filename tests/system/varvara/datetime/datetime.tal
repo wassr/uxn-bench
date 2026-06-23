@@ -1,0 +1,9 @@
+|0100
+@test
+    #c0 DEI2 POP2 ( just read c0-c1 year to ensure no crash )
+    #c2 DEI POP ( month )
+    #c3 DEI POP ( day )
+    #c4 DEI POP ( hour )
+    #c5 DEI POP ( minute )
+    #c6 DEI POP ( second )
+    #4f #18 DEO #4b #18 DEO #80 #0f DEO

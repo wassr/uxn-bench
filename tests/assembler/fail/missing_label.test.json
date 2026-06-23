@@ -1,0 +1,11 @@
+{
+  "name": "Missing Label",
+  "type": "assembler",
+  "run": {
+    "input": "missing_label.tal"
+  },
+  "verify": {
+    "type": "error_match",
+    "expected_stderr": "Label unknown"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Stack Underflow",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu/trap-on-stack"
+  ],
+  "run": {
+    "input": "stack_underflow.tal"
+  },
+  "verify": {
+    "type": "error_match",
+    "expected_stderr": "underflow"
+  }
+}

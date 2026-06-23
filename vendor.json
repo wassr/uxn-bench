@@ -1,0 +1,55 @@
+{
+  "uxn": {
+    "enabled": true,
+    "requires": ["cc"],
+    "repo": "https://git.sr.ht/~rabbits/uxn",
+    "branch": "next",
+    "build_steps": [
+      {
+        "cmd": "./build.sh --cli",
+        "bins": {
+          "bin/uxncli": "uxncli"
+        }
+      },
+      {
+        "cmd": "./build.sh",
+        "bins": {
+          "bin/uxnemu": "uxnemu"
+        }
+      },
+      {
+        "cmd": "git show origin/main:archive/uxnasm.c > uxnasm_modern.c && cc uxnasm_modern.c -o bin/uxnasm",
+        "bins": {
+          "bin/uxnasm": "uxnasm"
+        }
+      }
+    ]
+  },
+  "uxn2": {
+    "enabled": true,
+    "requires": ["cc", "sdl2-config"],
+    "repo": "https://git.sr.ht/~rabbits/uxn2",
+    "build_steps": [
+      {
+        "cmd": "make bin/uxn2",
+        "bins": {
+          "bin/uxn2": "uxn2"
+        }
+      }
+    ]
+  },
+  "drifblim": {
+    "enabled": true,
+    "requires": ["curl", "xxd"],
+    "repo": "",
+    "build_steps": [
+      {
+        "cmd": "mkdir -p bin && curl -s https://wiki.xxiivv.com/etc/drifblim.rom.txt | tr -d ' \\n\\r' | xxd -r -p > bin/drifblim.rom && printf '#!/bin/sh\\nDIR=\"$(cd \"$(dirname \"$0\")\" && pwd)\"\\n\"$DIR/uxn2\" \"$DIR/drifblim.rom\" \"$@\"\\n' > bin/drifblim && chmod +x bin/drifblim",
+        "bins": {
+          "bin/drifblim.rom": "drifblim.rom",
+          "bin/drifblim": "drifblim"
+        }
+      }
+    ]
+  }
+}

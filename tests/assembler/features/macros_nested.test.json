@@ -1,0 +1,14 @@
+{
+  "name": "Assembler Nested Macros",
+  "type": "assembler",
+  "capabilities": [
+    "assembler"
+  ],
+  "run": {
+    "input": "macros_nested.tal"
+  },
+  "verify": {
+    "type": "size_match",
+    "expected_size": 6
+  }
+}

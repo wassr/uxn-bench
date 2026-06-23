@@ -1,0 +1,11 @@
+{
+  "name": "Relative Jump Out of Range",
+  "type": "assembler",
+  "run": {
+    "input": "relative_too_far.tal"
+  },
+  "verify": {
+    "type": "error_match",
+    "expected_stderr": "Reference too far"
+  }
+}

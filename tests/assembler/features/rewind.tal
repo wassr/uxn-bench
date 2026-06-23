@@ -1,0 +1,6 @@
+|0100
+@test
+    [ LIT2 &addr $2 ]
+@recover
+|test/addr 1234
+|recover

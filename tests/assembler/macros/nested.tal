@@ -1,0 +1,4 @@
+%add-both { ADD }
+%do-math { #12 #34 add-both }
+|0100
+    do-math

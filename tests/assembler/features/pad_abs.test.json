@@ -1,0 +1,15 @@
+{
+  "name": "Assembler Absolute Padding",
+  "type": "assembler",
+  "capabilities": [
+    "assembler",
+    "assembler/pad-label"
+  ],
+  "run": {
+    "input": "pad_abs.tal"
+  },
+  "verify": {
+    "type": "size_match",
+    "expected_size": 260
+  }
+}

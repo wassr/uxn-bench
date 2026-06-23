@@ -1,0 +1,15 @@
+{
+  "name": "Console Stderr",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "varvara/console"
+  ],
+  "run": {
+    "input": "stderr.tal"
+  },
+  "verify": {
+    "type": "error_match",
+    "expected_stderr": "Err\n"
+  }
+}

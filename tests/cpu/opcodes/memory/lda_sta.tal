@@ -1,0 +1,16 @@
+|0100
+@test
+    #aa ;&val STA
+    ;&val LDA
+    #aa EQU ,&ok1 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok1
+    #aabb ;&val2 STA2
+    ;&val2 LDA2
+    #aabb EQU2 ,&ok2 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok2
+    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    
+&val $1
+&val2 $2

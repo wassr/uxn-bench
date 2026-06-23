@@ -1,0 +1,50 @@
+|0100
+@test
+    ( Write LIT2 opcode 0xa0 to 0xfffe )
+    #a0 #fffe STA
+    ( Write high byte 0x42 to 0xffff )
+    #42 #ffff STA
+    ( Write low byte 0x43 to 0x0000 )
+    #43 #0000 STA
+    
+    ( Write checking code to 0x0001 onwards )
+    ;&code #0001 ;&code_end ;&code SUB2 ,&write_loop JSR
+    
+    ( Jump to 0xfffe )
+    #fffe JMP2
+    
+&write_loop ( src* dst* len* -- )
+    ,&len STR2
+    ,&dst STR2
+    ,&src STR2
+&l
+    ,&src LDR2 LDA
+    ,&dst LDR2 STA
+    ,&src LDR2 INC2 ,&src STR2
+    ,&dst LDR2 INC2 ,&dst STR2
+    ,&len LDR2 #0001 SUB2 DUP2 ,&len STR2
+    #0000 NEQ2 ,&l JCN
+    JMP2r
+&src $2 &dst $2 &len $2
+    
+&code
+    a0 42 43 ( LIT2 4243 )
+    28       ( EQU2 )
+    3c 0a    ( JCN to ok, offset is 10 bytes )
+    80 46    ( LIT 46 'F' )
+    80 18    ( LIT 18 )
+    17       ( DEO )
+    80 81    ( LIT 81 )
+    80 0f    ( LIT 0f )
+    17       ( DEO )
+    ( ok )
+    80 4f    ( LIT 4f 'O' )
+    80 18    ( LIT 18 )
+    17       ( DEO )
+    80 4b    ( LIT 4b 'K' )
+    80 18 ( LIT 18 )
+    17       ( DEO )
+    80 80    ( LIT 80 )
+    80 0f    ( LIT 0f )
+    17       ( DEO )
+&code_end

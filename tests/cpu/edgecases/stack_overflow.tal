@@ -1,0 +1,9 @@
+|0100
+@test
+    #0100
+&loop
+    #11
+    #0001 SUB2
+    DUP2 #0000 NEQ2 ,&loop JCN
+    POP2
+    #80 #0f DEO

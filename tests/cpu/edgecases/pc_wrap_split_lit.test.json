@@ -1,0 +1,15 @@
+{
+  "name": "PC Wrap Split LIT",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu/wrap",
+    "varvara/console"
+  ],
+  "run": {
+    "input": "pc_wrap_split_lit.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "OK"
+  }
+}

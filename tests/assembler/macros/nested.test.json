@@ -1,0 +1,11 @@
+{
+  "name": "Nested Macros",
+  "type": "assembler",
+  "run": {
+    "input": "nested.tal"
+  },
+  "verify": {
+    "type": "binary_match",
+    "expected_rom": "nested.expected.rom"
+  }
+}

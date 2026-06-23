@@ -1,0 +1,15 @@
+|0100
+@test
+    #f0 #0f AND
+    #00 EQU ,&ok1 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok1
+    #ff #0f AND
+    #0f EQU ,&ok2 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok2
+    #ff00 #0f0f AND2
+    #0f00 EQU2 ,&ok3 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok3
+    #4f #18 DEO #4b #18 DEO #80 #0f DEO

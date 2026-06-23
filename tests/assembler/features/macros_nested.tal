@@ -1,0 +1,4 @@
+%macro-arity ( a b -- b ) { SWP POP }
+%macro-nested { macro-arity }
+|0100
+    #01 #02 macro-nested

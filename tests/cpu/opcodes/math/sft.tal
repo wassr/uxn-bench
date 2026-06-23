@@ -1,0 +1,23 @@
+|0100
+@test
+    #34 #10 SFT
+    #68 EQU ,&ok1 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok1
+    #34 #01 SFT
+    #1a EQU ,&ok2 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok2
+    #34 #11 SFT
+    #34 EQU ,&ok3 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok3
+    #1234 #20 SFT2
+    #48d0 EQU2 ,&ok4 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok4
+    #1234 #02 SFT2
+    #048d EQU2 ,&ok5 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok5
+    #4f #18 DEO #4b #18 DEO #80 #0f DEO

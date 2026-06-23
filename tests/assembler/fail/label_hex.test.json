@@ -1,0 +1,11 @@
+{
+  "name": "Hex Label Name Failure",
+  "type": "assembler",
+  "run": {
+    "input": "label_hex.tal"
+  },
+  "verify": {
+    "type": "error_match",
+    "expected_stderr": "Label invalid"
+  }
+}

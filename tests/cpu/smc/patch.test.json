@@ -1,0 +1,11 @@
+{
+  "name": "Self-Modifying Code",
+  "type": "interpreter",
+  "run": {
+    "input": "patch.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "OK"
+  }
+}

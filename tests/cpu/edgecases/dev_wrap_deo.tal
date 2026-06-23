@@ -1,0 +1,8 @@
+|0100
+@test
+    #1234 #ff DEO2
+    #ff DEI2
+    #1234 EQU2 ,&ok JCN
+    #46 #18 DEO #81 #0f DEO
+&ok
+    #4f #18 DEO #4b #18 DEO #80 #0f DEO

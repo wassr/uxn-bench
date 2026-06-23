@@ -1,0 +1,5 @@
+|0100
+@start
+$4 @label
+|start $label
+    #12

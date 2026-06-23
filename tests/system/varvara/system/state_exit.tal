@@ -1,0 +1,3 @@
+|0100
+@test
+    #80 #0f DEO ( exit success, state & 0x80 )

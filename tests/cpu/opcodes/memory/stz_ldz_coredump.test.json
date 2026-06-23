@@ -1,0 +1,16 @@
+{
+  "name": "STZ/LDZ (coredump)",
+  "type": "interpreter",
+  "capabilities": ["cpu", "cpu/coredump"],
+  "run": {
+    "input": "stz_ldz_coredump.tal"
+  },
+  "verify": {
+    "type": "coredump",
+    "wst": [66],
+    "wst_ptr": 1,
+    "ram": {
+      "0x10": [66]
+    }
+  }
+}

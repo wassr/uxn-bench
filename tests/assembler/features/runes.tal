@@ -1,0 +1,10 @@
+|0100
+@test
+    ?&forward
+    !&forward
+    ,&forward
+    .target
+    ;target
+    =target
+&forward
+@target

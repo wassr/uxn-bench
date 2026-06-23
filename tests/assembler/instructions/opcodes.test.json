@@ -1,0 +1,11 @@
+{
+  "name": "Opcodes & Modes",
+  "type": "assembler",
+  "run": {
+    "input": "opcodes.tal"
+  },
+  "verify": {
+    "type": "binary_match",
+    "expected_rom": "opcodes.expected.rom"
+  }
+}

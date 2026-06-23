@@ -1,0 +1,11 @@
+{
+  "name": "Duplicate Label Failure",
+  "type": "assembler",
+  "run": {
+    "input": "duplicate_label.tal"
+  },
+  "verify": {
+    "type": "error_match",
+    "expected_stderr": "Label duplicate"
+  }
+}

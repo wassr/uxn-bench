@@ -1,0 +1,17 @@
+{
+  "name": "Uxntal Acid Test",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "varvara/console",
+    "assembler/lambda",
+    "assembler/pad-label"
+  ],
+  "run": {
+    "input": "uxntal_acid.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "finish pass"
+  }
+}

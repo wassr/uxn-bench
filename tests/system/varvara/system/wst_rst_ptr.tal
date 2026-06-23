@@ -1,0 +1,14 @@
+|0100
+@test
+    ( Test reading WST ptr via device port 02 )
+    #11 #22
+    #02 DEI
+    #02 EQU ,&ok1 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok1
+    POP POP
+    #02 DEI
+    #00 EQU ,&ok2 JCN
+    #46 #18 DEO #01 #0f DEO
+&ok2
+    #4f #18 DEO #4b #18 DEO #80 #0f DEO
