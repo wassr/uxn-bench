@@ -1,9 +1,12 @@
 |0100
 @test
     #01 ,&target JCN
-    #46 #18 DEO #01 #0f DEO
+    #ff
+    BRK
 &target
     #00 ,&not-target JCN
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO BRK
+    #00 #01
+    BRK
 &not-target
-    #46 #18 DEO #01 #0f DEO
+    #ee
+    BRK

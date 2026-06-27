@@ -1,15 +1,16 @@
 {
-  "name": "Logic EOR",
+  "name": "EOR",
   "type": "interpreter",
   "capabilities": [
     "cpu",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "eor.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [255, 240, 240, 15],
+    "wst_ptr": 4
   }
 }

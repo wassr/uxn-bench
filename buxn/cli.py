@@ -20,9 +20,14 @@ def parse_args(args=None):
     run_parser.add_argument("--log-file", "-l", type=str, default="buxn.log", help="Path to write detailed verification logs")
     run_parser.add_argument("--timeout", "-t", type=float, default=2.0, help="Timeout in seconds for each test execution")
     run_parser.add_argument("--fail-fast", "-x", action="store_true", help="Stop on first failure")
-    run_parser.add_argument("--config", "-c", type=str, default="uxn-bench.json", help="Path to configuration file")
+    run_parser.add_argument("--config", "-c", type=str, default="buxn.json", help="Path to configuration file")
     
     # Vendor command
     vendor_parser = subparsers.add_parser("vendor", help="Fetch and build vendor tools (uxnasm, uxncli, uxn2)")
+    
+    # Undump command
+    undump_parser = subparsers.add_parser("undump", help="Display a coredump file in human-readable format")
+    undump_parser.add_argument("file", type=str, help="Path to the coredump file")
+    undump_parser.add_argument("--verbose", "-v", action="store_true", help="Show full hex dumps")
     
     return parser.parse_args(args)

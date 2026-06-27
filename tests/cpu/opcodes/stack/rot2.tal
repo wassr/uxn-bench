@@ -1,13 +1,4 @@
 |0100
 @test
-    #1122 #3344 #5566 ROT2
-    #1122 EQU2 ,&ok1 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok1
-    #5566 EQU2 ,&ok2 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok2
-    #3344 EQU2 ,&ok3 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok3
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    #1234 #5678 #9abc ROT2
+    BRK

@@ -13,9 +13,19 @@ def main():
     if args.command == "vendor":
         vendor.run(args)
         sys.exit(0)
+    
+    if args.command == "undump":
+        from .coredump import undump_command
+        success, output = undump_command(args.file, verbose=args.verbose)
+        if success:
+            print(output)
+            sys.exit(0)
+        else:
+            print(output, file=sys.stderr)
+            sys.exit(1)
         
     # Default behavior for 'run' or no command specified
-    config_path = getattr(args, "config", "uxn-bench.json")
+    config_path = getattr(args, "config", "buxn.json")
     
     logger.debug("Starting uxn-bench harness (Verbose mode enabled)")
     

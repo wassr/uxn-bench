@@ -1,15 +1,18 @@
 {
-  "name": "Circular Stack Underflow Wrap",
+  "name": "Circular Stack Wrap",
   "type": "interpreter",
   "capabilities": [
     "cpu/stack-wrap",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "stack_wrap_circular.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst_ptr": 0,
+    "wst": {
+      "255": [70]
+    }
   }
 }

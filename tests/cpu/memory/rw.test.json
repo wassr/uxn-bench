@@ -1,11 +1,19 @@
 {
-  "name": "Memory Read Write",
+  "name": "Memory Read/Write",
   "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "cpu/coredump"
+  ],
   "run": {
     "input": "rw.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [17, 34],
+    "wst_ptr": 2,
+    "ram": {
+      "0x200": [17, 34]
+    }
   }
 }

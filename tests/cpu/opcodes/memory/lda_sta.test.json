@@ -1,15 +1,16 @@
 {
-  "name": "Memory LDA/STA",
+  "name": "LDA/STA",
   "type": "interpreter",
   "capabilities": [
     "cpu",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "lda_sta.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [170, 170, 187, 18, 52, 1, 34, 18, 52],
+    "wst_ptr": 9
   }
 }

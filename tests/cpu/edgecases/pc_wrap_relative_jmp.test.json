@@ -1,0 +1,16 @@
+{
+  "name": "PC Wrap Relative Jump",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu/wrap",
+    "cpu/coredump"
+  ],
+  "run": {
+    "input": "pc_wrap_relative_jmp.tal"
+  },
+  "verify": {
+    "type": "coredump",
+    "wst": [66],
+    "wst_ptr": 1
+  }
+}

@@ -1,6 +1,8 @@
 |0100
 @test
     ;&target JMP2
-    #46 #18 DEO #01 #0f DEO
+    #ff
+    BRK
 &target
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO BRK
+    #00 #01
+    BRK

@@ -1,15 +1,16 @@
 {
-  "name": "Stack ROT2",
+  "name": "ROT2",
   "type": "interpreter",
   "capabilities": [
     "cpu",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "rot2.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [86, 120, 154, 188, 18, 52],
+    "wst_ptr": 6
   }
 }

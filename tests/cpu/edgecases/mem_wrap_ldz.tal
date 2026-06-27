@@ -3,7 +3,4 @@
     #12 #ff STZ ( STZ at 0xff )
     #34 #00 STZ ( STZ at 0x00 )
     #ff LDZ2 ( LDZ2 at 0xff touches 0x00ff and 0x0000 in zero page )
-    #1234 EQU2 ,&ok JCN
-    #46 #18 DEO #01 #0f DEO
-&ok
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    BRK

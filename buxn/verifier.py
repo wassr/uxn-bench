@@ -4,6 +4,7 @@ from typing import List
 
 from .runner import ExecutionResult
 from .discovery import TestNode
+from .coredump import parse_coredump as _parse_coredump
 
 @dataclass
 class RuleResult:
@@ -16,35 +17,19 @@ class VerificationResult:
     passed: bool
     rules: List[RuleResult]
 
-COREDUMP_MAGIC = b"UXNC"
-COREDUMP_VERSION = 1
-COREDUMP_STACK_SIZE = 256
-COREDUMP_RAM_SIZE = 65536
-
 def parse_coredump(data: bytes) -> dict:
-    header_size = 4 + 1 + 1 + 1  # magic + version + wst_ptr + rst_ptr
-    expected_size = header_size + 2 * COREDUMP_STACK_SIZE + COREDUMP_RAM_SIZE
-    if len(data) != expected_size:
-        raise ValueError(f"Coredump has wrong size: expected {expected_size} bytes, got {len(data)}")
-    if data[0:4] != COREDUMP_MAGIC:
-        raise ValueError(f"Bad coredump magic: {data[0:4]!r}")
-    version = data[4]
-    if version != COREDUMP_VERSION:
-        raise ValueError(f"Unsupported coredump version: {version}")
-
-    offset = 7
-    wst = data[offset:offset + COREDUMP_STACK_SIZE]
-    offset += COREDUMP_STACK_SIZE
-    rst = data[offset:offset + COREDUMP_STACK_SIZE]
-    offset += COREDUMP_STACK_SIZE
-    ram = data[offset:offset + COREDUMP_RAM_SIZE]
-
+    """Parse a coredump and return as a dict for backwards compatibility.
+    
+    This wraps the coredump module's parse_coredump to maintain the
+    original dict-based interface used by the verifier.
+    """
+    state = _parse_coredump(data)
     return {
-        "wst_ptr": data[5],
-        "rst_ptr": data[6],
-        "wst": wst,
-        "rst": rst,
-        "ram": ram,
+        "wst_ptr": state.wst_ptr,
+        "rst_ptr": state.rst_ptr,
+        "wst": state.wst,
+        "rst": state.rst,
+        "ram": state.ram,
     }
 
 class Verifier:

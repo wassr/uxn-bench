@@ -1,27 +1,9 @@
 |0100
 @test
     #12 #34 LTH
-    #01 EQU ,&ok1 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok1
     #34 #12 LTH
-    #00 EQU ,&ok2 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok2
     #12 #12 LTH
-    #00 EQU ,&ok3 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok3
     #7f #ff LTH
-    #01 EQU ,&ok4 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok4
     #1234 #3456 LTH2
-    #01 EQU ,&ok5 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok5
     #3456 #1234 LTH2
-    #00 EQU ,&ok6 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok6
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    BRK

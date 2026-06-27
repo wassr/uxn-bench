@@ -1,15 +1,16 @@
 {
-  "name": "Math DIV",
+  "name": "DIV",
   "type": "interpreter",
   "capabilities": [
     "cpu",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "div.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [5, 0, 16],
+    "wst_ptr": 3
   }
 }

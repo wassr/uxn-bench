@@ -1,3 +1,14 @@
 |0100
 @test
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    ( Write INC 0x01 to 0x0000 )
+    #01 #0000 STA
+    ( Write BRK 0x00 to 0x0001 )
+    #00 #0001 STA
+    ( Write INC 0x01 to 0xffff )
+    #01 #ffff STA
+    
+    ( Push 0x10 to stack )
+    #10
+    
+    ( Jump to 0xffff )
+    #ffff JMP2

@@ -1,10 +1,7 @@
 |0100
 @test
-    #18 ,&target STR ( write ADD opcode )
+    #18 ,target STR
     #10 #20
-&target
+@target
     00
-    #30 EQU ,&ok JCN
-    #46 #18 DEO #01 #0f DEO
-&ok
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    BRK

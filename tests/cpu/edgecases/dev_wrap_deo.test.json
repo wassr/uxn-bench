@@ -3,13 +3,14 @@
   "type": "interpreter",
   "capabilities": [
     "cpu/wrap",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "dev_wrap_deo.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [18, 52],
+    "wst_ptr": 2
   }
 }

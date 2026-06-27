@@ -1,0 +1,6 @@
+|0100
+@test
+    STHr POP
+    #12 #34 STH STH
+    ADDr
+    BRK

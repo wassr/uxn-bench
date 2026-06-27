@@ -1,15 +1,19 @@
 {
-  "name": "Memory LDZ/STZ",
+  "name": "LDZ/STZ",
   "type": "interpreter",
   "capabilities": [
     "cpu",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "ldz_stz.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [18, 52, 86, 120, 154, 132, 120, 154],
+    "wst_ptr": 8,
+    "ram": {
+      "0x84": [120, 154]
+    }
   }
 }

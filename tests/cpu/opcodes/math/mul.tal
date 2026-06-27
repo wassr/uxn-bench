@@ -1,15 +1,6 @@
 |0100
 @test
     #03 #05 MUL
-    #0f EQU ,&ok1 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok1
     #0100 #0003 MUL2
-    #0300 EQU2 ,&ok2 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok2
     #80 #02 MUL
-    #00 EQU ,&ok3 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok3
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    BRK

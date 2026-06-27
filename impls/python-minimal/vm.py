@@ -76,19 +76,21 @@ class Uxn:
     def load_rom(self, rom: bytes) -> None:
         self.ram[0x0100:0x0100 + len(rom)] = rom
 
-    def read_mem(self, addr: int, short: bool) -> int:
+    def read_mem(self, addr: int, short: bool, zp: bool = False) -> int:
+        mask = MASK8 if zp else MASK16
         if short:
-            hi = self.ram[addr & MASK16]
-            lo = self.ram[(addr + 1) & MASK16]
+            hi = self.ram[addr & mask]
+            lo = self.ram[(addr + 1) & mask]
             return (hi << 8) | lo
-        return self.ram[addr & MASK16]
+        return self.ram[addr & mask]
 
-    def write_mem(self, addr: int, value: int, short: bool) -> None:
+    def write_mem(self, addr: int, value: int, short: bool, zp: bool = False) -> None:
+        mask = MASK8 if zp else MASK16
         if short:
-            self.ram[addr & MASK16] = (value >> 8) & MASK8
-            self.ram[(addr + 1) & MASK16] = value & MASK8
+            self.ram[addr & mask] = (value >> 8) & MASK8
+            self.ram[(addr + 1) & mask] = value & MASK8
         else:
-            self.ram[addr & MASK16] = value & MASK8
+            self.ram[addr & mask] = value & MASK8
 
     def dei(self, port: int, short: bool) -> int:
         if short:
@@ -195,10 +197,10 @@ class Uxn:
             dst.push(a, short)
         elif base == 0x10:  # LDZ
             addr = src.peek8(0) if keep else src.pop8()
-            src.push(self.read_mem(addr, short), short)
+            src.push(self.read_mem(addr, short, zp=True), short)
         elif base == 0x11:  # STZ
             addr, val = self._pop_store_operands(src, keep, short, addr_short=False)
-            self.write_mem(addr, val, short)
+            self.write_mem(addr, val, short, zp=True)
         elif base == 0x12:  # LDR
             addr = src.peek8(0) if keep else src.pop8()
             src.push(self.read_mem((pc + signed8(addr)) & MASK16, short), short)
@@ -238,7 +240,7 @@ class Uxn:
         elif base == 0x1f:  # SFT
             if keep:
                 shift = src.peek8(0)
-                a = src.peek16(1) if short else src.peek8(1)
+                a = ((src.peek8(2) << 8) | src.peek8(1)) if short else src.peek8(1)
             else:
                 shift = src.pop8()
                 a = src.pop16() if short else src.pop8()

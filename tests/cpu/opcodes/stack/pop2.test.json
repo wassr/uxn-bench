@@ -1,15 +1,16 @@
 {
-  "name": "Stack POP2",
+  "name": "POP2",
   "type": "interpreter",
   "capabilities": [
     "cpu",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "pop2.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [18, 52],
+    "wst_ptr": 2
   }
 }

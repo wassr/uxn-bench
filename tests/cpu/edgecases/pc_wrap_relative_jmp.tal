@@ -1,0 +1,24 @@
+|0100
+@test
+    ( 1. Write JMP 0x0c to zero page 0x0010 )
+    #0c #10 STZ
+
+    ( 2. Write LIT 8 JMP to 0xfff3 )
+    #80 #fff3 STA
+    #08 #fff4 STA
+    #0c #fff5 STA
+
+    ( 3. Write JMI 0x40 at 0xfffe, offset 0x000a at 0xffff and 0x0000 )
+    #40 #fffe STA
+    #00 #ffff STA
+    #0a #0000 STA
+
+    ( 4. Write LIT 42 and BRK starting at 0x000b )
+    #80 #000b STA
+    #42 #000c STA
+    #00 #000d STA
+
+    ( Start execution of Test 1: relative jump wrapping under 0 )
+    ( We push -30 to WST and jump to 0x0010 )
+    #e2 ( -30 )
+    #0010 JMP2

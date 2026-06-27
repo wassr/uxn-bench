@@ -1,15 +1,16 @@
 {
-  "name": "Stack POP",
+  "name": "POP",
   "type": "interpreter",
   "capabilities": [
     "cpu",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "pop.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [17],
+    "wst_ptr": 1
   }
 }

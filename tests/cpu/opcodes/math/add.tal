@@ -1,15 +1,6 @@
 |0100
 @test
     #12 #34 ADD
-    #46 EQU ,&ok1 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok1
     #1234 #5678 ADD2
-    #68ac EQU2 ,&ok2 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok2
     #ff #02 ADD
-    #01 EQU ,&ok3 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok3
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    BRK

@@ -1,0 +1,19 @@
+{
+  "name": "Circular Return Stack Wrap",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu/stack-wrap",
+    "cpu/coredump"
+  ],
+  "run": {
+    "input": "stack_wrap_circular_rst.tal"
+  },
+  "verify": {
+    "type": "coredump",
+    "wst_ptr": 0,
+    "rst_ptr": 0,
+    "rst": {
+      "255": [70]
+    }
+  }
+}

@@ -1,19 +1,7 @@
 |0100
 @test
-    #12 #34 NEQ
-    #01 EQU ,&ok1 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok1
     #12 #12 NEQ
-    #00 EQU ,&ok2 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok2
-    #1234 #5678 NEQ2
-    #01 EQU ,&ok3 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok3
+    #12 #34 NEQ
     #1234 #1234 NEQ2
-    #00 EQU ,&ok4 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok4
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    #1234 #5678 NEQ2
+    BRK

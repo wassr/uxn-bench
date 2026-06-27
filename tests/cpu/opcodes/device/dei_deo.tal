@@ -1,8 +1,8 @@
 |0100
 @test
-    #12 #f0 DEO ( write to unmanaged port 0xf0 )
+    #12 #f0 DEO
     #f0 DEI
-    #12 EQU ,&ok JCN
-    #46 #18 DEO #01 #0f DEO
-&ok
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    
+    #1234 #f0 DEO2k
+    #f0 DEI2
+    BRK

@@ -1,15 +1,16 @@
 {
-  "name": "Self-Modifying Code (SMC)",
+  "name": "Self Modifying Code STR",
   "type": "interpreter",
   "capabilities": [
     "cpu",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "smc.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [48],
+    "wst_ptr": 1
   }
 }

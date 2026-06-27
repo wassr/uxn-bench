@@ -2,9 +2,4 @@
 @test
     #1122 #0200 STA2
     #0200 LDA2
-    #1122 EQU2 ,&ok-1 JCN
-    #31 #18 DEO #01 #0f DEO
-&ok-1
-    #4f #18 DEO
-    #4b #18 DEO
-    #80 #0f DEO
+    BRK

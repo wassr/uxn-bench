@@ -2,7 +2,4 @@
 @test
     POP
     #12 #34 ADD
-    #46 EQU ,&ok JCN
-    #46 #18 DEO #81 #0f DEO
-&ok
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    BRK

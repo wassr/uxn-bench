@@ -1,15 +1,16 @@
 {
-  "name": "Math MUL",
+  "name": "MUL",
   "type": "interpreter",
   "capabilities": [
     "cpu",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "mul.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [15, 3, 0, 0],
+    "wst_ptr": 4
   }
 }

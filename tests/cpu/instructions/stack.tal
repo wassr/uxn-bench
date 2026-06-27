@@ -1,15 +1,4 @@
 |0100
 @test
     #01 #02 #03 ROT
-    #01 EQU ,&ok-1 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok-1
-    #03 EQU ,&ok-2 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok-2
-    #02 EQU ,&ok-3 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok-3
-    #4f #18 DEO
-    #4b #18 DEO
-    #80 #0f DEO
+    BRK

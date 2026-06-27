@@ -1,11 +1,5 @@
 |0100
 @test
     #10 #03 DIV
-    #05 EQU ,&ok1 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok1
     #0100 #0010 DIV2
-    #0010 EQU2 ,&ok2 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok2
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    BRK

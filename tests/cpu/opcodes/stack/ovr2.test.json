@@ -1,15 +1,16 @@
 {
-  "name": "Stack OVR2",
+  "name": "OVR2",
   "type": "interpreter",
   "capabilities": [
     "cpu",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "ovr2.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [18, 52, 86, 120, 18, 52],
+    "wst_ptr": 6
   }
 }

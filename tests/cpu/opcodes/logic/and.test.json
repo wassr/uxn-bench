@@ -1,15 +1,16 @@
 {
-  "name": "Logic AND",
+  "name": "AND",
   "type": "interpreter",
   "capabilities": [
     "cpu",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "and.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [0, 15, 15, 0],
+    "wst_ptr": 4
   }
 }

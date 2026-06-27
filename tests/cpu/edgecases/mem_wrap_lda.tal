@@ -3,7 +3,4 @@
     #12 #ffff STA ( STA at 0xffff should touch 0xffff )
     #34 #0000 STA ( STA at 0x0000 should touch 0x0000 )
     #ffff LDA2 ( LDA2 at 0xffff touches 0xffff and wraps to 0x0000 )
-    #1234 EQU2 ,&ok JCN
-    #46 #18 DEO #01 #0f DEO
-&ok
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    BRK

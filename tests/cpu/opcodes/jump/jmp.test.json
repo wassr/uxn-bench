@@ -1,15 +1,16 @@
 {
-  "name": "Jump JMP",
+  "name": "JMP",
   "type": "interpreter",
   "capabilities": [
     "cpu",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "jmp.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [0, 1],
+    "wst_ptr": 2
   }
 }

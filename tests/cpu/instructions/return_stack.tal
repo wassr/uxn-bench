@@ -1,0 +1,38 @@
+|0100
+@test
+    ( 1. Push initial shorts to RST )
+    LIT2r 1234
+    LIT2r 5678
+
+    ( 2. Test SUB2r: 0x1234 - 0x5678 = 0xbbbc )
+    SUB2r
+
+    ( 3. Test DUPr: duplicate 0xbc on RST )
+    DUPr
+
+    ( 4. Push 0x11 and SWPr: swap 0xbc and 0x11 )
+    LITr 11
+    SWPr
+
+    ( 5. Test ADDr: 0x11 + 0xbc = 0xcd )
+    ADDr
+    ( RST should now have: 0xbb, 0xbc, 0xcd )
+
+    ( 6. Test JCN2r: conditional absolute jump via RST )
+    LITr 01
+    ;ok_jcn STH2
+    JCN2r
+    BRK ( Fail if we don't jump )
+
+@ok_jcn
+    ( 7. Test JSR2r: cross-stack call to sub )
+    ;sub STH2
+    JSR2r
+
+    ( After return, WST has 0x42, RST has 0xbb, 0xbc, 0xcd )
+    BRK
+
+@sub
+    STH2 ( Move return PC from WST to RST )
+    #42  ( Push 0x42 to WST )
+    JMP2r ( Return via return address on RST )

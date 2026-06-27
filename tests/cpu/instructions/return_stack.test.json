@@ -1,0 +1,18 @@
+{
+  "name": "Return Stack Variants",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "cpu/coredump"
+  ],
+  "run": {
+    "input": "return_stack.tal"
+  },
+  "verify": {
+    "type": "coredump",
+    "wst": [66],
+    "wst_ptr": 1,
+    "rst": [187, 188, 205],
+    "rst_ptr": 3
+  }
+}

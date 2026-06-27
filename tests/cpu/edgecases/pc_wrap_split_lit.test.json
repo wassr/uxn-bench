@@ -1,15 +1,16 @@
 {
-  "name": "PC Wrap Split LIT",
+  "name": "PC Wrap Split Literal",
   "type": "interpreter",
   "capabilities": [
     "cpu/wrap",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "pc_wrap_split_lit.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [66],
+    "wst_ptr": 1
   }
 }

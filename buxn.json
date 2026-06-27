@@ -1,7 +1,7 @@
 {
   "defaults": {
     "assembler": "uxnasm",
-    "interpreter": "uxn2"
+    "interpreter": "python-minimal"
   },
   "assemblers": {
     "uxnasm": {

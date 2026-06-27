@@ -1,15 +1,16 @@
 {
-  "name": "Logic EQU",
+  "name": "EQU",
   "type": "interpreter",
   "capabilities": [
     "cpu",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "equ.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [1, 0, 1, 0],
+    "wst_ptr": 4
   }
 }

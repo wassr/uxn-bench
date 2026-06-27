@@ -1,11 +1,16 @@
 {
-  "name": "Basic Sanity",
+  "name": "Sanity",
   "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "cpu/coredump"
+  ],
   "run": {
     "input": "basic.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [79, 75],
+    "wst_ptr": 2
   }
 }

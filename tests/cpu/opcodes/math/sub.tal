@@ -1,15 +1,6 @@
 |0100
 @test
     #34 #12 SUB
-    #22 EQU ,&ok1 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok1
     #5678 #1234 SUB2
-    #4444 EQU2 ,&ok2 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok2
     #00 #01 SUB
-    #ff EQU ,&ok3 JCN
-    #46 #18 DEO #01 #0f DEO
-&ok3
-    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+    BRK

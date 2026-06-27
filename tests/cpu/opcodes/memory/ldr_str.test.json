@@ -1,15 +1,16 @@
 {
-  "name": "Memory LDR/STR",
+  "name": "LDR/STR",
   "type": "interpreter",
   "capabilities": [
     "cpu",
-    "varvara/console"
+    "cpu/coredump"
   ],
   "run": {
     "input": "ldr_str.tal"
   },
   "verify": {
-    "type": "stdout_match",
-    "expected_stdout": "OK"
+    "type": "coredump",
+    "wst": [85, 18, 52, 86, 120, 5, 86, 120],
+    "wst_ptr": 8
   }
 }
