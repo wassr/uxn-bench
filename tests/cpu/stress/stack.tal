@@ -1,0 +1,39 @@
+%stack_block {
+    #11 #22 #33 #44
+    DUP POP SWP SWP OVR POP
+    ROT ROT ROT NIP #33 SWP
+    DUP2 POP2 SWP2 SWP2 OVR2 POP2
+    STH STH STHr STHr SWP
+    STH2 STH2 STH2r STH2r SWP2
+    DUPk POP2
+    SWPk POP2
+    OVRk POP POP2
+    DUP2k POP2 POP2
+    SWP2k POP2 POP2
+    OVR2k POP2 POP2 POP2
+    
+    POP2 POP2
+}
+
+|0100
+    ( Initialize loop counter on RST: 3,500 -> 0x0dac )
+    #0dac STH2
+
+@loop
+    stack_block
+    stack_block
+    stack_block
+    stack_block
+    stack_block
+
+    ( Decrement loop counter on RST )
+    STH2r #0001 SUB2 DUP2 STH2 ORA
+    ?loop
+
+    ( clean up loop counter from RST )
+    POP2r
+
+    ( success: exit with 00 )
+    #00
+    #80 #0f DEO
+    BRK

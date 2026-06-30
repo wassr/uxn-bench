@@ -1,5 +1,5 @@
 {
-  "name": "Increment to One Million",
+  "name": "Increment to 100000",
   "type": "interpreter",
   "capabilities": [
     "cpu",
