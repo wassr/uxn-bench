@@ -1,0 +1,51 @@
+|0000
+@ptr $2
+
+|0100
+    ( initialize ptr to 0x2000 )
+    #2000 .ptr STZ2
+
+@write_loop
+    .ptr LDZ2
+    DUP2
+    NIP
+    ROT ROT
+    STA
+
+    ( increment ptr )
+    #0001 .ptr LDZ2 ADD2
+    DUP2 .ptr STZ2
+
+    ( loop until ptr is 0xc000 )
+    #c000 NEQ2
+    ?write_loop
+
+    ( verify phase: reset ptr to 0x2000 )
+    #2000 .ptr STZ2
+
+@read_loop
+    .ptr LDZ2
+    LDA
+    .ptr LDZ2
+    NIP
+    EQU
+    ?continue
+
+    ( mismatch: push error flag and exit )
+    #01
+    #01 #0f DEO
+    BRK
+
+@continue
+    ( increment ptr )
+    #0001 .ptr LDZ2 ADD2
+    DUP2 .ptr STZ2
+
+    ( loop until ptr is 0xc000 )
+    #c000 NEQ2
+    ?read_loop
+
+    ( success: push 00 and exit )
+    #00
+    #80 #0f DEO
+    BRK

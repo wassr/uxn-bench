@@ -1,0 +1,17 @@
+{
+  "name": "Opcode Correctness",
+  "origin": "git.sr.ht/~rabbits/uxn-utils",
+  "license": "MIT (Copyright (c) Devine Lu Linvega)",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "varvara/console"
+  ],
+  "run": {
+    "input": "opc.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "Dev-wrap: pass"
+  }
+}

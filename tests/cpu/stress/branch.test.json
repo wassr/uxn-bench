@@ -1,0 +1,17 @@
+{
+  "name": "Bubble Sort Branching Stress",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "cpu/coredump"
+  ],
+  "run": {
+    "input": "branch.tal",
+    "timeout": 5
+  },
+  "verify": {
+    "type": "coredump",
+    "wst": [0],
+    "wst_ptr": 1
+  }
+}

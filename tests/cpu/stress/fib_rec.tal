@@ -1,0 +1,31 @@
+|0100
+    ( compute fib(19) )
+    #0013
+    fib
+    
+    ( check if result is 4181 -> 0x1055 )
+    #1055 EQU2
+    ?success
+    
+    ( failure: exit with 01 )
+    #01
+    #01 #0f DEO
+    BRK
+
+@success
+    ( success: exit with 00 )
+    #00
+    #80 #0f DEO
+    BRK
+
+@fib ( n* -- fib_n* )
+    ( if n < 2, return n )
+    DUP2 #0002 LTH2
+    ?{
+        ( else: recurse )
+        DUP2 #0001 SUB2 fib
+        SWP2 #0002 SUB2 fib
+        ADD2
+        JMP2r
+    }
+    JMP2r

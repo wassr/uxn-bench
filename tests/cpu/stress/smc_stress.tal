@@ -1,0 +1,42 @@
+|0000
+@counter $2
+
+|0100
+    ( initialize loop counter to 10,000 -> 0x2710 )
+    #2710 .counter STZ2
+
+@loop
+    ( write ADD (0x18) to target )
+    #18 ;target STA
+    #05 #03
+@target
+    00
+    
+    ( write SUB (0x19) to target2 )
+    #19 ;target2 STA
+    #02
+@target2
+    00
+    
+    ( check if top of stack is 06 )
+    #06 EQU
+    ?continue
+    
+    ( mismatch: exit with error )
+    #01
+    #01 #0f DEO
+    BRK
+
+@continue
+    ( decrement counter )
+    .counter LDZ2 #0001 SUB2
+    DUP2 .counter STZ2
+    
+    ( loop if counter != 0 )
+    #0000 NEQ2
+    ?loop
+
+    ( success: exit with 00 )
+    #00
+    #80 #0f DEO
+    BRK

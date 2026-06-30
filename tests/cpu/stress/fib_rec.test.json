@@ -1,0 +1,17 @@
+{
+  "name": "Recursive Fibonacci 19",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "cpu/coredump"
+  ],
+  "run": {
+    "input": "fib_rec.tal",
+    "timeout": 5
+  },
+  "verify": {
+    "type": "coredump",
+    "wst": [0],
+    "wst_ptr": 1
+  }
+}

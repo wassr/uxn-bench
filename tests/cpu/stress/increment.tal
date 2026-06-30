@@ -1,0 +1,31 @@
+|0000
+@counter
+    &high $2 &low $2
+@target
+    &high $2 &low $2 
+
+|0100
+    #0001 .target/high STZ2
+    #86a0 .target/low  STZ2
+
+@loop
+    .target/high LDZ2
+    .counter/high LDZ2
+    EQU2
+    .target/low LDZ2
+    .counter/low LDZ2
+    EQU2
+    AND
+    ?end
+
+    #0001 .counter/low LDZ2 ADD2
+    DUP2 .counter/low STZ2
+    ORA
+    ?loop
+
+    #0001 .counter/high LDZ2 ADD2 .counter/high STZ2
+    !loop
+
+@end
+    #80 #0f DEO
+    BRK

@@ -1,0 +1,19 @@
+{
+  "name": "Increment to One Million",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "cpu/coredump"
+  ],
+  "run": {
+    "input": "increment.tal",
+    "timeout": 30
+  },
+  "verify": {
+    "type": "coredump",
+    "ram": {
+      "0x0000": [0, 1],
+      "0x0002": [134, 160]
+    }
+  }
+}

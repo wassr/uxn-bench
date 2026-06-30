@@ -1,0 +1,17 @@
+{
+  "name": "Memory Fill and Read 40KB",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "cpu/coredump"
+  ],
+  "run": {
+    "input": "mem_fill.tal",
+    "timeout": 15
+  },
+  "verify": {
+    "type": "coredump",
+    "wst": [0],
+    "wst_ptr": 1
+  }
+}

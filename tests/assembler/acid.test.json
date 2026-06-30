@@ -1,5 +1,7 @@
 {
-  "name": "Uxntal Acid Test",
+  "name": "Acid Test",
+  "origin": "git.sr.ht/~rabbits/drifblim",
+  "license": "MIT (Copyright (c) Devine Lu Linvega)",
   "type": "interpreter",
   "capabilities": [
     "cpu",

@@ -1,0 +1,17 @@
+{
+  "name": "Self-Modifying Code Stress (10,000 iterations)",
+  "type": "interpreter",
+  "capabilities": [
+    "cpu",
+    "cpu/coredump"
+  ],
+  "run": {
+    "input": "smc_stress.tal",
+    "timeout": 10
+  },
+  "verify": {
+    "type": "coredump",
+    "wst": [0],
+    "wst_ptr": 1
+  }
+}

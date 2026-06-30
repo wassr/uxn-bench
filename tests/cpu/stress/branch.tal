@@ -1,0 +1,83 @@
+|0000
+@seed $1
+@i $1
+@j $1
+@addr $2
+@temp_j $1
+@temp_j1 $1
+
+|0100
+    ( Initialize seed to 0x5a )
+    #5a .seed STZ
+    ( Initialize i to 0x00 )
+    #00 .i STZ
+
+@fill_loop
+    ( seed = seed * 109 + 89 )
+    .seed LDZ #6d MUL #59 ADD .seed STZ
+    
+    ( arr[i] = seed )
+    .seed LDZ
+    #2000 .i LDZ #00 SWP ADD2
+    STA
+    
+    ( i++ )
+    .i LDZ #01 ADD DUP .i STZ
+    ?fill_loop
+
+    ( Run Bubble Sort )
+    #00 .i STZ
+
+@outer_loop
+    #00 .j STZ
+
+@inner_loop
+    ( read arr[j] )
+    #2000 .j LDZ #00 SWP ADD2 DUP2 .addr STZ2
+    LDA .temp_j STZ
+    
+    ( read arr[j+1] )
+    .addr LDZ2 #0001 ADD2 LDA .temp_j1 STZ
+    
+    ( compare )
+    .temp_j LDZ .temp_j1 LDZ GTH
+    ?swap
+
+@continue_inner
+    ( j++ )
+    .j LDZ #01 ADD DUP .j STZ
+    #ff NEQ
+    ?inner_loop
+
+    ( i++ )
+    .i LDZ #01 ADD DUP .i STZ
+    #ff NEQ
+    ?outer_loop
+
+    ( Verify that array is sorted: arr[k] == k for all k )
+    #00 .i STZ
+
+@verify_loop
+    #2000 .i LDZ #00 SWP ADD2 LDA
+    .i LDZ
+    EQU
+    ?verify_continue
+    
+    ( mismatch! push 01 and exit )
+    #01
+    #01 #0f DEO
+    BRK
+
+@verify_continue
+    .i LDZ #01 ADD DUP .i STZ
+    ?verify_loop
+
+    ( success! push 00 and exit )
+    #00
+    #80 #0f DEO
+    BRK
+
+@swap
+    .temp_j1 LDZ .addr LDZ2 STA
+    .temp_j LDZ .addr LDZ2 #0001 ADD2 STA
+    !continue_inner
