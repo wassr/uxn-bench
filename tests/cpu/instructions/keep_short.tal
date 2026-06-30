@@ -1,0 +1,32 @@
+|0100
+
+@test
+    ( 1. Test DUP2k )
+    #1234 DUP2k
+    ( Stack: 12 34 12 34 )
+
+    ( 2. Test NIP2k )
+    #5678 NIP2k
+    ( Stack: 12 34 12 34 56 78 56 78 )
+
+    ( 3. Test JCN2k )
+    #01 ;&ok JCN2k
+    #46 #18 DEO #01 #0f DEO ( fail if no jump )
+
+&ok
+    ( Clean up stack: pop <addr> (short) and 01 (byte) and 56 78 56 78 12 34 12 34 )
+    POP2 POP POP2 POP2 POP2 POP2
+
+    ( 4. Test STAk )
+    #55 ;&target_mem STAk
+    POP2 POP ( clean stack )
+
+    ( Verify the write succeeded )
+    ,&target_mem LDA #55 EQU ,&ok_store JCN
+    #46 #18 DEO #01 #0f DEO
+
+&ok_store
+    #4f #18 DEO #4b #18 DEO #80 #0f DEO
+
+@&target_mem
+    $1
