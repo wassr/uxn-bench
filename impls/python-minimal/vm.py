@@ -10,8 +10,34 @@ e.g. per-byte Console stdin vectoring is not supported. See README.md.
 
 import argparse
 import sys
-
 from devices import Devices
+
+import os
+import atexit
+
+_covered_lines = set()
+def _trace_vm(frame, event, arg):
+    if event == 'line':
+        filename = frame.f_code.co_filename
+        if "python-minimal" in filename:
+            base = os.path.basename(filename)
+            if base in ("vm.py", "devices.py"):
+                _covered_lines.add((base, frame.f_lineno))
+    return _trace_vm
+
+if os.environ.get("BUXN_COVERAGE") == "1":
+    sys.settrace(_trace_vm)
+    def _save_coverage():
+        sys.settrace(None)
+        cov_dir = os.path.join(".buxn", "tmp", "coverage")
+        os.makedirs(cov_dir, exist_ok=True)
+        import uuid
+        cov_file = os.path.join(cov_dir, f"{uuid.uuid4()}.cov")
+        with open(cov_file, "w") as f:
+            for base, line in _covered_lines:
+                f.write(f"{base}:{line}\n")
+        sys.stderr.write(f"COVERAGE SAVED: {len(_covered_lines)} lines\n")
+    atexit.register(_save_coverage)
 
 RAM_SIZE = 0x10000
 STACK_SIZE = 0x100

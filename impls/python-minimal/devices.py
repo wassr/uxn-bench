@@ -6,8 +6,10 @@ README.md for the rationale and the tests this rules out.
 
 import sys
 
-SYSTEM_WST = 0x04
-SYSTEM_RST = 0x05
+SYSTEM_WST_LEGACY = 0x02
+SYSTEM_RST_LEGACY = 0x03
+SYSTEM_WST_MODERN = 0x04
+SYSTEM_RST_MODERN = 0x05
 SYSTEM_STATE = 0x0f
 CONSOLE_WRITE = 0x18
 CONSOLE_ERROR = 0x19
@@ -22,18 +24,18 @@ class Devices:
         self.exit_code = 0
 
     def dei(self, port: int) -> int:
-        if port == SYSTEM_WST:
+        if port in (SYSTEM_WST_LEGACY, SYSTEM_WST_MODERN):
             return self.wst.ptr
-        if port == SYSTEM_RST:
+        if port in (SYSTEM_RST_LEGACY, SYSTEM_RST_MODERN):
             return self.rst.ptr
         return self.page[port]
 
     def deo(self, port: int, value: int) -> None:
         value &= 0xff
         self.page[port] = value
-        if port == SYSTEM_WST:
+        if port in (SYSTEM_WST_LEGACY, SYSTEM_WST_MODERN):
             self.wst.ptr = value
-        elif port == SYSTEM_RST:
+        elif port in (SYSTEM_RST_LEGACY, SYSTEM_RST_MODERN):
             self.rst.ptr = value
         elif port == SYSTEM_STATE and value != 0:
             self.halted = True
