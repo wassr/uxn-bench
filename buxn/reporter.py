@@ -47,18 +47,18 @@ class ExecutionReporter:
             return False, unsupported
         return True, []
         
-    def run_all(self):
+    def run_all(self) -> int:
         # Open log file
         with open(self.log_file, "a") as lf:
             lf.write(f"\n--- Execution Run: {datetime.datetime.now().isoformat()} ---\n")
             
             # If quiet mode, live tree is too noisy. Fallback to plain which is silent on success.
             if self.plain or self.quiet:
-                self._run_plain(lf)
+                return self._run_plain(lf)
             else:
-                self._run_live(lf)
+                return self._run_live(lf)
                 
-    def _run_plain(self, lf):
+    def _run_plain(self, lf) -> int:
         total_succeeded = 0
         total_failed = 0
         total_skipped = 0
@@ -112,8 +112,9 @@ class ExecutionReporter:
                 break
                 
         self._print_summary(total_succeeded, total_failed, total_skipped, total_duration)
+        return total_failed
  
-    def _run_live(self, lf):
+    def _run_live(self, lf) -> int:
         # Build initial tree
         tree = Tree("[bold blue]uxn-bench tests[/bold blue]")
         groups = {}
@@ -195,6 +196,7 @@ class ExecutionReporter:
                     break
                     
         self._print_summary(total_succeeded, total_failed, total_skipped, total_duration)
+        return total_failed
  
     def _log_test(self, lf, test, e_res, v_res):
         passed = v_res.passed

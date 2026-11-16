@@ -180,11 +180,11 @@ class Uxn:
         elif base == 0x02:  # POP
             if not keep:
                 src.pop(short)
-        elif base == 0x03:  # DUP
+        elif base == 0x06:  # DUP
             a = src.peek(0, short) if keep else src.pop(short)
             src.push(a, short)
             src.push(a, short)
-        elif base == 0x04:  # NIP
+        elif base == 0x03:  # NIP
             if keep:
                 b = src.peek(0, short)
                 src.peek(1, short)
@@ -192,18 +192,18 @@ class Uxn:
                 b = src.pop(short)
                 src.pop(short)
             src.push(b, short)
-        elif base == 0x05:  # SWP
+        elif base == 0x04:  # SWP
             b = src.peek(0, short) if keep else src.pop(short)
             a = src.peek(1, short) if keep else src.pop(short)
             src.push(b, short)
             src.push(a, short)
-        elif base == 0x06:  # OVR
+        elif base == 0x07:  # OVR
             b = src.peek(0, short) if keep else src.pop(short)
             a = src.peek(1, short) if keep else src.pop(short)
             src.push(a, short)
             src.push(b, short)
             src.push(a, short)
-        elif base == 0x07:  # ROT
+        elif base == 0x05:  # ROT
             c = src.peek(0, short) if keep else src.pop(short)
             b = src.peek(1, short) if keep else src.pop(short)
             a = src.peek(2, short) if keep else src.pop(short)

@@ -9,7 +9,7 @@
     "input": "stderr.tal"
   },
   "verify": {
-    "type": "error_match",
+    "type": "stderr_match",
     "expected_stderr": "Err\n"
   }
 }

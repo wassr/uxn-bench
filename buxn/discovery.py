@@ -3,6 +3,7 @@ import fnmatch
 from pathlib import Path
 from dataclasses import dataclass
 from typing import List, Dict, Optional
+from .validation import validate_fixture
 from .logger import get_logger
 
 logger = get_logger(__name__)
@@ -48,9 +49,9 @@ class DiscoveryEngine:
             try:
                 with open(path, "r") as f:
                     config = json.load(f)
-            except Exception as e:
-                logger.error(f"Failed to read config {path}: {e}")
-                continue
+                validate_fixture(config)
+            except (OSError, ValueError) as e:
+                raise ValueError(f"Invalid fixture {path}: {e}") from e
 
             name = config.get("name", test_id)
             node = TestNode(

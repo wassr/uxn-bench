@@ -51,6 +51,8 @@ def parse_args(args=None):
     bench_parser.add_argument("--interpreter", "-r", type=str, help="Interpreter(s) to benchmark (comma-separated list, e.g. py-min,uxncli)")
     bench_parser.add_argument("--config", "-c", type=str, default="buxn.json", help="Path to configuration file")
     bench_parser.add_argument("--runs", "-n", type=int, default=5, help="Number of measurement runs (default: 5)")
+    bench_parser.add_argument("--timeout", "-t", type=float, default=300.0, help="Timeout in seconds per interpreter execution (default: 300)")
+    bench_parser.add_argument("--baseline-interpreter", help="Interpreter whose latest history to use as the comparison baseline")
     bench_parser.add_argument("--vs", type=str, default="latest", help="Run to compare against (latest, or JSON file path)")
 
     return parser.parse_args(args)

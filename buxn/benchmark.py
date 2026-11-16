@@ -101,7 +101,7 @@ def run_benchmarks(args, config: dict):
     benchmarks = engine.discover(includes=includes, excludes=excludes, pattern="*.bench.json")
     if not benchmarks:
         print("No benchmarks found.", file=sys.stderr)
-        sys.exit(0)
+        return 1
         
     # Determine target interpreters
     interpreters_in_config = config.get("interpreters", {})
@@ -128,6 +128,7 @@ def run_benchmarks(args, config: dict):
     
     runner = Runner(config)
     results = []
+    failed = skipped = 0
     
     for bench in benchmarks:
         print(f"\nBenchmark: {bench.name} ({bench.id}) [Revision: {bench.config.get('revision', 1)}]")
@@ -139,13 +140,15 @@ def run_benchmarks(args, config: dict):
             # Check capabilities
             missing = [cap for cap in required_caps if cap not in provided_caps]
             if missing:
+                skipped += 1
                 print(f"  {int_name:18}: SKIPPED (missing: {', '.join(missing)})")
                 continue
                 
             print(f"  {int_name:18}: running baseline & {args.runs} measurements...", end="", flush=True)
             try:
-                res = runner.run_benchmark(bench, int_name, runs=args.runs)
+                res = runner.run_benchmark(bench, int_name, runs=args.runs, timeout=args.timeout)
                 if not res["verified"]:
+                    failed += 1
                     print(" FAILED VERIFICATION")
                     print(f"    Stdout: {res['stdout'].strip()}")
                     print(f"    Stderr: {res['stderr'].strip()}")
@@ -153,11 +156,12 @@ def run_benchmarks(args, config: dict):
                     results.append(res)
                     print(f" OK (Overhead: {res['overhead_ms']:.1f}ms | Raw Median: {res['median_warm_raw_ms']:.1f}ms | Adj Median: {res['median_warm_adjusted_ms']:.1f}ms)")
             except Exception as e:
+                failed += 1
                 print(f" ERROR: {e}")
                 
     if not results:
         print("\nNo benchmarks successfully ran and verified.")
-        sys.exit(1)
+        return max(1, failed)
         
     # Group results by interpreter and save them
     env_metadata = get_system_metadata()
@@ -184,21 +188,29 @@ def run_benchmarks(args, config: dict):
     for r in results:
         print(f"{r['benchmark']:28} | {r['interpreter']:18} | {r['interpreter_version']:8} | {r['median_warm_raw_ms']:8.1f}ms | {r['median_warm_adjusted_ms']:11.1f}ms |")
     print("=" * 80)
+    print(f"{len(results)} passed, {failed} failed, {skipped} skipped")
+    return failed
 
 def compare_benchmarks(args, config: dict):
     """Compare two benchmark runs to identify regression/speedups."""
-    latest_file = get_latest_run_file()
-    if not latest_file:
-        print("No historical benchmark runs found. Please run a benchmark first.", file=sys.stderr)
-        sys.exit(1)
-        
-    # Target file resolves vs. latest
+    candidate = args.interpreter
+    if candidate and ("," in candidate or candidate not in config.get("interpreters", {})):
+        print("Comparison requires one configured candidate interpreter.", file=sys.stderr)
+        return 1
+    baseline_interpreter = (getattr(args, "baseline_interpreter", None) or candidate
+                            or config.get("defaults", {}).get("interpreter"))
     vs_target = args.vs
     if vs_target == "latest":
-        vs_file = latest_file
+        if not baseline_interpreter:
+            print("Select an interpreter for the latest baseline.", file=sys.stderr)
+            return 1
+        vs_file = get_latest_run_file(baseline_interpreter)
+        if vs_file is None:
+            print(f"No history for interpreter '{baseline_interpreter}'.", file=sys.stderr)
+            return 1
     else:
         vs_file = Path(vs_target)
-        
+
     if not vs_file.exists():
         # Try finding in the history dir
         for p in HISTORY_DIR.rglob(vs_target):
@@ -220,23 +232,28 @@ def compare_benchmarks(args, config: dict):
         sys.exit(1)
         
     # Discover and run benchmarks matching the target interpreter of the vs file
-    target_int = vs_data["results"][0]["interpreter"]
-    print(f"Comparing current performance against version {vs_data['results'][0]['interpreter_version']} of '{target_int}'")
+    target_int = candidate or vs_data["results"][0]["interpreter"]
+    if target_int not in config.get("interpreters", {}):
+        print(f"Interpreter {target_int!r} is not configured.", file=sys.stderr)
+        return 1
+    print(f"Comparing {target_int!r} against {vs_data['results'][0]['interpreter']!r} version {vs_data['results'][0]['interpreter_version']}")
     print(f"Baseline run date: {vs_data['timestamp']}")
     print("=" * 80)
     
     # Run benchmarks for target interpreter
     engine = DiscoveryEngine(tests_dir="benchmarks")
-    benchmarks = engine.discover(pattern="*.bench.json")
+    benchmarks = engine.discover(includes=args.include, excludes=args.exclude, pattern="*.bench.json")
     runner = Runner(config)
     
     print(f"{'Benchmark':28} | {'Base (Adjusted)':16} | {'New (Adjusted)':15} | {'Diff':10} | {'Verdict':8} |")
     print("-" * 80)
     
     regressions_detected = False
+    compared = failed = skipped = 0
     
     for bench in benchmarks:
         if bench.id not in vs_results:
+            skipped += 1
             continue
             
         base_res = vs_results[bench.id]
@@ -245,16 +262,32 @@ def compare_benchmarks(args, config: dict):
         curr_revision = bench.config.get("revision", 1)
         base_revision = base_res.get("benchmark_revision", 1)
         if curr_revision != base_revision:
+            skipped += 1
             print(f"{bench.id:28} | [WARNING: Revision mismatch! Base: r{base_revision} vs Current: r{curr_revision}]")
             continue
             
+        missing = set(bench.config.get("capabilities", [])) - set(config["interpreters"][target_int].get("capabilities", []))
+        if missing:
+            skipped += 1
+            print(f"{bench.id:28} | SKIPPED (missing: {', '.join(sorted(missing))})")
+            continue
+
         # Run benchmark
         try:
-            res = runner.run_benchmark(bench, target_int, runs=args.runs)
+            res = runner.run_benchmark(bench, target_int, runs=args.runs, timeout=args.timeout)
             if not res["verified"]:
+                failed += 1
                 print(f"{bench.id:28} | Verification Failed on new run")
                 continue
                 
+            baseline_hash = base_res.get("rom_sha256")
+            if baseline_hash and baseline_hash != res.get("rom_sha256"):
+                failed += 1
+                print(f"{bench.id:28} | ROM hash mismatch; cannot compare different programs")
+                continue
+            if not baseline_hash:
+                print(f"{bench.id:28} | WARNING: legacy baseline has no ROM hash")
+            compared += 1
             base_ms = base_res["median_warm_adjusted_ms"]
             new_ms = res["median_warm_adjusted_ms"]
             
@@ -275,13 +308,18 @@ def compare_benchmarks(args, config: dict):
             diff_str = f"{pct_diff:+.1f}%"
             print(f"{bench.id:28} | {base_ms:12.1f}ms | {new_ms:11.1f}ms | {diff_str:10} | {verdict:8} |")
         except Exception as e:
+            failed += 1
             print(f"{bench.id:28} | ERROR: {e}")
             
     print("=" * 80)
-    if regressions_detected:
+    print(f"{compared} compared, {failed} failed, {skipped} skipped")
+    if failed or not compared:
+        print("Comparison incomplete: failures occurred or no benchmarks were compared.")
+    elif regressions_detected:
         print("\n[WARNING] Regressions detected (>5% slowdown).")
     else:
         print("\nAll compared benchmarks are stable or faster.")
+    return max(1, failed) if failed or not compared else 0
 
 def show_history(args, config: dict):
     """Display historical performance logs for a single interpreter across its versions."""

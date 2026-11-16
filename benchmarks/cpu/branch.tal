@@ -42,7 +42,7 @@
     
     ( compare )
     .temp_j LDZ .temp_j1 LDZ GTH
-    ,swap JCN
+    ;swap JCN2
 
 @continue_inner
     ( j++ )
@@ -59,7 +59,7 @@
     #0000 .i STZ2
 
 @verify_loop
-    .i LDZ2 #07fe EQU2
+    .i LDZ2 #07ff EQU2
     ,ok_skip JCN
     
     ( read arr[i] )
@@ -69,8 +69,8 @@
     GTH
     ,&fail JCN
     
-    .i LDZ2 #0001 ADD2 DUP2 .i STZ2
-    ,verify_loop JCN
+    .i LDZ2 #0001 ADD2 .i STZ2
+    ;verify_loop JMP2
 
 &fail
     ( failure! print 'FAIL' and exit )

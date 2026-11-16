@@ -22,7 +22,7 @@ class TestDiscoveryEngine(unittest.TestCase):
         p = self.tests_path / f"{test_id}.test.json"
         p.parent.mkdir(parents=True, exist_ok=True)
         with open(p, "w") as f:
-            json.dump(config, f)
+            json.dump({"run": {"input": "example.tal"}, "verify": {"type": "stdout_match", "expected_stdout": "OK"}, **config}, f)
             
     def test_discovery_all(self):
         engine = DiscoveryEngine(tests_dir=str(self.tests_path))

@@ -1,3 +1,5 @@
+import hashlib
+import shutil
 import shlex
 import subprocess
 import time
@@ -40,6 +42,17 @@ class Runner:
             if vendored.exists():
                 argv[0] = str(vendored)
         return argv
+
+    def tool_identity(self, tool_name: str, spec: dict) -> dict:
+        """Record the command, executable/script hashes, and supplied build details."""
+        argv = self._build_argv(tool_name, spec.get("cmd", tool_name), {})
+        files = {}
+        for index, arg in enumerate(argv):
+            candidate = shutil.which(arg) if index == 0 else arg
+            if candidate and Path(candidate).is_file():
+                path = Path(candidate).resolve()
+                files[str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
+        return {"command": argv, "files": files, "build_metadata": spec.get("build_metadata", {})}
 
     def run_test(self, test: TestNode, timeout: float = 2.0) -> ExecutionResult:
         test_type = test.config.get("type", "assembler")
@@ -116,10 +129,12 @@ class Runner:
             duration_ms=duration_ms
         )
 
-    def run_benchmark(self, bench: TestNode, int_tool_name: str, runs: int = 5, timeout: float = 10.0) -> dict:
-        import os
+    def run_benchmark(self, bench: TestNode, int_tool_name: str, runs: int = 5, timeout: float = 300.0) -> dict:
         import statistics
         import math
+
+        if runs < 1:
+            raise ValueError("Benchmark runs must be at least 1")
 
         # Stage 1: Write empty.tal & compile empty.rom to compute baseline process overhead
         empty_tal_path = BUXN_TMP_DIR / "empty.tal"
@@ -157,20 +172,25 @@ class Runner:
         dump_file = bench_tmp_dir / "core.dump"
         dump_file.unlink(missing_ok=True)
 
+        identity = self.tool_identity(int_tool_name, int_spec)
+        assembler_identity = self.tool_identity(asm_tool_name, asm_spec)
+        rom_hash = hashlib.sha256(bench_rom.read_bytes()).hexdigest()
+
         # Measure baseline process overhead by running empty.rom N=5 times
         cmd_empty = self._build_argv(int_tool_name, int_cmd_template, {
             "rom": empty_rom_path,
-            "dump_file": "",
+            "dump_file": dump_file if supports_coredump else "",
         })
 
         overhead_runs = []
         for _ in range(5):
             t_start = time.perf_counter()
-            subprocess.run(cmd_empty, capture_output=True, timeout=timeout)
+            subprocess.run(cmd_empty, capture_output=True, check=True, timeout=timeout)
             t_end = time.perf_counter()
             overhead_runs.append((t_end - t_start) * 1000.0)  # ms
 
         overhead_median = statistics.median(overhead_runs)
+        dump_file.unlink(missing_ok=True)  # baseline state must not verify the workload
 
         # Build runner command for the benchmark
         cmd_bench = self._build_argv(int_tool_name, int_cmd_template, {
@@ -179,39 +199,33 @@ class Runner:
         })
         stdin_data = bench.config.get("run", {}).get("stdin")
 
-        # 1. Cold Start Run (first warm-up run)
-        t_start = time.perf_counter()
-        res_cold = subprocess.run(cmd_bench, input=stdin_data, capture_output=True, text=True, timeout=timeout)
-        t_end = time.perf_counter()
-        cold_start_raw = (t_end - t_start) * 1000.0
-        cold_start_adjusted = max(0.0, cold_start_raw - overhead_median)
-
-        # 2. Additional Warm-up Run
-        subprocess.run(cmd_bench, input=stdin_data, capture_output=True, timeout=timeout)
-
-        # 3. Measurement Runs (runs)
-        warm_runs_raw = []
-        last_res = None
-        for _ in range(runs):
-            t_start = time.perf_counter()
-            last_res = subprocess.run(cmd_bench, input=stdin_data, capture_output=True, text=True, timeout=timeout)
-            t_end = time.perf_counter()
-            warm_runs_raw.append((t_end - t_start) * 1000.0)
-
-        warm_runs_adjusted = [max(0.0, r - overhead_median) for r in warm_runs_raw]
-
-        # Verify correctness using the output of the last run
-        exec_res = ExecutionResult(
-            returncode=last_res.returncode,
-            stdout=last_res.stdout,
-            stderr=last_res.stderr,
-            output_files={"rom": bench_rom, "coredump": dump_file} if dump_file.exists() else {"rom": bench_rom},
-            duration_ms=warm_runs_raw[-1]
-        )
-
         from .verifier import Verifier
         verifier = Verifier()
-        verify_res = verifier.verify(bench, exec_res)
+
+        def execute_workload():
+            dump_file.unlink(missing_ok=True)
+            start = time.perf_counter()
+            result = subprocess.run(cmd_bench, input=stdin_data, capture_output=True, text=True, timeout=timeout)
+            duration = (time.perf_counter() - start) * 1000.0
+            files = {"rom": bench_rom}
+            if dump_file.exists():
+                files["coredump"] = dump_file
+            verification = verifier.verify(bench, ExecutionResult(
+                result.returncode, result.stdout, result.stderr, files, duration))
+            if not verification.passed:
+                details = "; ".join(rule.details for rule in verification.rules if not rule.passed)
+                raise ValueError(f"Benchmark verification failed: {details}")
+            return result, duration
+
+        # Each execution has independent output and verification, outside the timer.
+        _, cold_start_raw = execute_workload()
+        cold_start_adjusted = max(0.0, cold_start_raw - overhead_median)
+        execute_workload()
+        warm_runs_raw = []
+        for _ in range(runs):
+            last_res, duration = execute_workload()
+            warm_runs_raw.append(duration)
+        warm_runs_adjusted = [max(0.0, r - overhead_median) for r in warm_runs_raw]
 
         # Compute statistics
         def stats(runs_list):
@@ -234,10 +248,13 @@ class Runner:
 
         return {
             "benchmark": bench.id,
+            "rom_sha256": rom_hash,
+            "interpreter_identity": identity,
+            "assembler_identity": assembler_identity,
             "benchmark_revision": bench.config.get("revision", 1),
             "interpreter": int_tool_name,
             "interpreter_version": int_spec.get("version", "unknown"),
-            "verified": verify_res.passed,
+            "verified": True,
             "overhead_ms": overhead_median,
             "overhead_runs": [round(x, 2) for x in overhead_runs],
             "cold_start_raw_ms": round(cold_start_raw, 2),

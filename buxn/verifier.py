@@ -2,9 +2,11 @@ import hashlib
 from dataclasses import dataclass
 from typing import List
 
+from .validation import verification_rules
 from .runner import ExecutionResult
 from .discovery import TestNode
-from .coredump import parse_coredump as _parse_coredump
+from .coredump import (parse_coredump as _parse_coredump,
+                       FLAG_WST, FLAG_RST, FLAG_RAM, FLAG_DEV, FLAG_CYCLES)
 
 @dataclass
 class RuleResult:
@@ -26,6 +28,7 @@ def parse_coredump(data: bytes) -> dict:
     state = _parse_coredump(data)
     return {
         "version": state.version,
+        "presence_flags": state.presence_flags,
         "wst_ptr": state.wst_ptr,
         "rst_ptr": state.rst_ptr,
         "halt_reason": state.halt_reason,
@@ -41,10 +44,10 @@ def parse_coredump(data: bytes) -> dict:
 class Verifier:
     def verify(self, test: TestNode, exec_res: ExecutionResult) -> VerificationResult:
         rules = []
-        verify_spec = test.config.get("verify", {})
-
-        if isinstance(verify_spec, dict):
-            verify_spec = [verify_spec]
+        try:
+            verify_spec = verification_rules(test.config.get("verify"))
+        except ValueError as e:
+            return VerificationResult(False, [RuleResult("configuration", False, str(e))])
 
         all_passed = True
 
@@ -55,6 +58,8 @@ class Verifier:
                 res = self._check_binary_match(test, exec_res, spec)
             elif vtype == "error_match":
                 res = self._check_error_match(test, exec_res, spec)
+            elif vtype == "stderr_match":
+                res = self._check_output("stderr_match", exec_res.stderr, spec["expected_stderr"], spec)
             elif vtype == "stdout_match":
                 res = self._check_stdout_match(test, exec_res, spec)
             elif vtype == "hash_match":
@@ -102,19 +107,18 @@ class Verifier:
             return RuleResult("binary_match", False, f"Size: expected {len(expected_data)}, actual {len(actual_data)}")
 
     def _check_error_match(self, test: TestNode, exec_res: ExecutionResult, spec: dict) -> RuleResult:
-        expected_err = spec.get("expected_stderr", "")
-        combined = (exec_res.stderr or "") + "\n" + (exec_res.stdout or "")
-        if expected_err in combined:
-            return RuleResult("error_match", True, f"Found '{expected_err}' in output.")
-        else:
-            return RuleResult("error_match", False, f"Expected '{expected_err}' but got:\nStderr: {exec_res.stderr}\nStdout: {exec_res.stdout}")
+        if exec_res.returncode <= 0:
+            return RuleResult("error_match", False, f"Expected a positive failure exit code, got {exec_res.returncode}")
+        output = exec_res.stderr if spec.get("match") == "exact" else (exec_res.stderr or "") + "\n" + (exec_res.stdout or "")
+        return self._check_output("error_match", output, spec["expected_stderr"], spec)
 
     def _check_stdout_match(self, test: TestNode, exec_res: ExecutionResult, spec: dict) -> RuleResult:
-        expected_out = spec.get("expected_stdout", "")
-        if expected_out in exec_res.stdout:
-            return RuleResult("stdout_match", True, f"Found '{expected_out}' in stdout.")
-        else:
-            return RuleResult("stdout_match", False, f"Expected '{expected_out}' but got: {exec_res.stdout}")
+        return self._check_output("stdout_match", exec_res.stdout, spec["expected_stdout"], spec)
+
+    def _check_output(self, name: str, actual: str, expected: str, spec: dict) -> RuleResult:
+        exact = spec.get("match", "contains") == "exact"
+        passed = actual == expected if exact else expected in actual
+        return RuleResult(name, passed, f"Expected {'exact output' if exact else 'substring'} {expected!r}, got {actual!r}")
 
     def _check_hash_match(self, test: TestNode, exec_res: ExecutionResult, spec: dict) -> RuleResult:
         expected_hash = spec.get("expected_hash")
@@ -156,21 +160,27 @@ class Verifier:
             return [RuleResult("coredump", False, str(e))]
 
         results = []
-
-        if "wst_ptr" in spec:
-            results.append(self._check_byte_field("wst_ptr", spec["wst_ptr"], state["wst_ptr"]))
-        if "rst_ptr" in spec:
-            results.append(self._check_byte_field("rst_ptr", spec["rst_ptr"], state["rst_ptr"]))
-        if "wst" in spec:
-            results.extend(self._check_stack_field("wst", spec["wst"], state["wst"], state["wst_ptr"]))
-        if "rst" in spec:
-            results.extend(self._check_stack_field("rst", spec["rst"], state["rst"], state["rst_ptr"]))
-        if "wst_top" in spec:
-            results.append(self._check_top_field("wst_top", spec["wst_top"], state["wst"], state["wst_ptr"]))
-        if "rst_top" in spec:
-            results.append(self._check_top_field("rst_top", spec["rst_top"], state["rst"], state["rst_ptr"]))
-        if "ram" in spec:
-            results.extend(self._check_ram_field(spec["ram"], state["ram"]))
+        scalar_fields = {"wst_ptr", "rst_ptr", "pc", "halt_reason", "exit_code", "cycles"}
+        section_flags = {"wst": FLAG_WST, "wst_top": FLAG_WST,
+                         "rst": FLAG_RST, "rst_top": FLAG_RST,
+                         "ram": FLAG_RAM, "dev": FLAG_DEV, "cycles": FLAG_CYCLES}
+        for field, expected in spec.items():
+            if field == "type":
+                continue
+            flag = section_flags.get(field)
+            if flag is not None and not state["presence_flags"] & flag:
+                results.append(RuleResult(field, False, f"Coredump section missing for {field}"))
+            elif state["version"] == 1 and field in {"pc", "halt_reason", "exit_code"}:
+                results.append(RuleResult(field, False, f"{field} is unavailable in v1 dumps"))
+            elif field in scalar_fields:
+                results.append(self._check_byte_field(field, expected, state[field]))
+            elif field in {"wst", "rst"}:
+                results.extend(self._check_stack_field(field, expected, state[field], state[field + "_ptr"]))
+            elif field in {"wst_top", "rst_top"}:
+                stack = field[:3]
+                results.append(self._check_top_field(field, expected, state[stack], state[stack + "_ptr"]))
+            elif field in {"ram", "dev"}:
+                results.extend(self._check_ram_field(expected, state[field]))
 
         if not results:
             results.append(RuleResult("coredump", False, "No coredump fields specified to verify."))

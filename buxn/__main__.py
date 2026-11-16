@@ -44,12 +44,16 @@ def main():
             logger.error("No valid configuration found. Exiting.")
             sys.exit(1)
             
-        if args.bench_action == "run":
-            run_benchmarks(args, config)
-        elif args.bench_action == "compare":
-            compare_benchmarks(args, config)
-        elif args.bench_action == "history":
-            show_history(args, config)
+        try:
+            if args.bench_action == "run":
+                sys.exit(run_benchmarks(args, config))
+            elif args.bench_action == "compare":
+                sys.exit(compare_benchmarks(args, config))
+            elif args.bench_action == "history":
+                show_history(args, config)
+        except ValueError as e:
+            logger.error(str(e))
+            sys.exit(1)
         sys.exit(0)
     
     # Default behavior for 'test' or no command specified
@@ -81,7 +85,11 @@ def main():
     includes = getattr(args, "include", None)
     excludes = getattr(args, "exclude", None)
     
-    tests = engine.discover(includes=includes, excludes=excludes)
+    try:
+        tests = engine.discover(includes=includes, excludes=excludes)
+    except ValueError as e:
+        logger.error(str(e))
+        sys.exit(1)
     
     if not tests:
         logger.info("No tests discovered. Exiting.")
@@ -103,7 +111,7 @@ def main():
         timeout=getattr(args, "timeout", 2.0)
     )
     
-    reporter.run_all()
+    sys.exit(reporter.run_all())
 
 
 def _run_asm_command(args):

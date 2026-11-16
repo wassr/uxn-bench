@@ -11,6 +11,7 @@
   },
   "verify": {
     "type": "stdout_match",
-    "expected_stdout": ""
+    "expected_stdout": "",
+    "match": "exact"
   }
 }

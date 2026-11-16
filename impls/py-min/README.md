@@ -52,3 +52,17 @@ is configured as both assembler and interpreter.
 `../../coredump_design.md`: `UXNC` magic, 1-byte version (2), WST/RST pointers,
 halt reason, exit code, PC, presence flags bitmask, WST/RST arrays, Device I/O page,
 64KB RAM, and cycle counter.
+
+## Running benchmarks
+
+From the repository root, run:
+
+```sh
+python3 -m buxn bench run --interpreter py-min --runs 1
+```
+
+Benchmarks include two warm-up executions in addition to the measurements.
+The Python interpreter can take several minutes per execution for large
+workloads such as bubble sort. The default benchmark timeout is 300 seconds
+per execution; increase it with `--timeout 600` on slower machines. Both
+`bench run` and `bench compare` accept this option.

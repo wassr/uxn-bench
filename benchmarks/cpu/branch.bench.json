@@ -1,6 +1,6 @@
 {
   "name": "Bubble Sort Branching Benchmark",
-  "revision": 2,
+  "revision": 3,
   "capabilities": [
     "cpu",
     "varvara/console"
