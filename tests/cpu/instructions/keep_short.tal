@@ -22,8 +22,9 @@
     POP2 POP ( clean stack )
 
     ( Verify the write succeeded )
-    ,&target_mem LDA #55 EQU ,&ok_store JCN
+    ;&target_mem LDA #55 EQU ,&ok_store JCN
     #46 #18 DEO #01 #0f DEO
+
 
 &ok_store
     #4f #18 DEO #4b #18 DEO #80 #0f DEO

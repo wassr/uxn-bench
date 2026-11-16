@@ -1,0 +1,48 @@
+|0000
+@n $2
+@d $2
+@count $2
+
+|0100
+    ( Initialize count to 1 because 2 is prime )
+    #0001 .count STZ2
+    ( Start testing odd numbers from n = 3 )
+    #0003 .n STZ2
+
+@prime_loop
+    ( Test if n is prime )
+    #0003 .d STZ2
+
+@test_divisor
+    ( If d * d > n, then n is prime! )
+    .d LDZ2 DUP2 MUL2 .n LDZ2 GTH2 ,&is_prime JCN
+
+    ( If n % d == 0, then n is not prime )
+    .n LDZ2 .d LDZ2 DIV2 .d LDZ2 MUL2 .n LDZ2 EQU2 ,&not_prime JCN
+
+    ( Else, d = d + 2 and continue )
+    .d LDZ2 #0002 ADD2 .d STZ2
+    ;test_divisor JMP2
+
+&is_prime
+    .count LDZ2 #0001 ADD2 .count STZ2
+
+&not_prime
+    ( n = n + 2 )
+    .n LDZ2 #0002 ADD2 DUP2 .n STZ2
+    #0bb9 NEQ2
+    ,prime_loop JCN
+
+    ( Verify that count is 430 -> 0x01ae )
+    .count LDZ2 #01ae EQU2 ,&success JCN
+
+    ( failure: print 'FAIL' and exit )
+    #46 #18 DEO #41 #18 DEO #49 #18 DEO #4c #18 DEO
+    #01 #0f DEO
+    BRK
+
+&success
+    ( success: print 'OK' and exit )
+    #4f #18 DEO #4b #18 DEO
+    #80 #0f DEO
+    BRK

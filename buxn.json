@@ -1,7 +1,7 @@
 {
   "defaults": {
-    "assembler": "uxnasm",
-    "interpreter": "python-minimal"
+    "assembler": "py-min",
+    "interpreter": "go-min"
   },
   "assemblers": {
     "uxnasm": {
@@ -28,8 +28,8 @@
       ],
       "state_extractors": ["assembler/basic"]
     },
-    "python-minimal": {
-      "cmd": "python3 impls/python-minimal/asm.py {input} {output}",
+    "py-min": {
+      "cmd": "python3 impls/py-min/asm.py {input} {output}",
       "capabilities": [
         "assembler",
         "assembler/jsi",
@@ -44,6 +44,7 @@
   "interpreters": {
     "uxncli": {
       "cmd": "uxncli {rom}",
+      "version": "2.0.0",
       "capabilities": [
         "cpu",
         "cpu/trap-on-div-zero",
@@ -57,6 +58,7 @@
     },
     "uxn2": {
       "cmd": "uxn2 {rom}",
+      "version": "2.0.0",
       "capabilities": [
         "cpu",
         "cpu/wrap",
@@ -74,6 +76,7 @@
     },
     "uxnemu": {
       "cmd": "uxnemu {rom}",
+      "version": "2.0.0",
       "capabilities": [
         "cpu",
         "cpu/wrap",
@@ -89,8 +92,22 @@
       ],
       "state_extractors": ["varvara/console", "varvara/system", "varvara/file"]
     },
-    "python-minimal": {
-      "cmd": "python3 impls/python-minimal/vm.py {rom} --dump-on-halt {dump_file}",
+    "py-min": {
+      "cmd": "python3 impls/py-min/vm.py {rom} --dump-on-halt {dump_file}",
+      "version": "1.0.0",
+      "capabilities": [
+        "cpu",
+        "cpu/wrap",
+        "cpu/stack-wrap",
+        "cpu/coredump",
+        "varvara/system",
+        "varvara/console"
+      ],
+      "state_extractors": ["varvara/console", "varvara/system", "cpu/coredump"]
+    },
+    "go-min": {
+      "cmd": "go-min {rom} --dump-on-halt {dump_file}",
+      "version": "1.0.0",
       "capabilities": [
         "cpu",
         "cpu/wrap",

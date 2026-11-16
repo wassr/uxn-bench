@@ -19,7 +19,7 @@ class TestRunner(unittest.TestCase):
                 "uxn2": {
                     "cmd": "uxn2 {rom}"
                 },
-                "python-minimal": {
+                "py-min": {
                     "cmd": "python3 vm.py {rom} --dump-on-halt {dump_file}",
                     "capabilities": ["cpu/coredump"]
                 }
@@ -36,14 +36,14 @@ class TestRunner(unittest.TestCase):
         self.assertEqual(cmd, ["uxnasm", "in.tal", "out.rom"])
         
     def test_build_argv_with_dump(self):
-        cmd = self.runner._build_argv("python-minimal", "python3 vm.py {rom} --dump-on-halt {dump_file}", {
+        cmd = self.runner._build_argv("py-min", "python3 vm.py {rom} --dump-on-halt {dump_file}", {
             "rom": "out.rom",
             "dump_file": "core.dump"
         })
         self.assertEqual(cmd, ["python3", "vm.py", "out.rom", "--dump-on-halt", "core.dump"])
         
     def test_build_argv_empty_token(self):
-        cmd = self.runner._build_argv("python-minimal", "python3 vm.py {rom} {dump_file}", {
+        cmd = self.runner._build_argv("py-min", "python3 vm.py {rom} {dump_file}", {
             "rom": "out.rom",
             "dump_file": ""
         })

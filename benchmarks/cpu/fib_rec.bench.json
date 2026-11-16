@@ -1,0 +1,15 @@
+{
+  "name": "Recursive Fibonacci 30 Benchmark",
+  "revision": 2,
+  "capabilities": [
+    "cpu",
+    "varvara/console"
+  ],
+  "run": {
+    "input": "fib_rec.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "OK"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Memory Block Copy Benchmark",
+  "revision": 1,
+  "capabilities": [
+    "cpu",
+    "varvara/console"
+  ],
+  "run": {
+    "input": "mem_copy.tal"
+  },
+  "verify": {
+    "type": "stdout_match",
+    "expected_stdout": "OK"
+  }
+}

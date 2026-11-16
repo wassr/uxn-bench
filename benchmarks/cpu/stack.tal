@@ -1,0 +1,50 @@
+%stack_block {
+    #11 #22 #33 #44
+    DUP POP SWP SWP OVR POP
+    ROT ROT ROT NIP #33 SWP
+    DUP2 POP2 SWP2 SWP2 OVR2 POP2
+    STH STH STHr STHr SWP
+    STH2 STH2 STH2r STH2r SWP2
+    DUPk POP2
+    SWPk POP2
+    OVRk POP POP2
+    DUP2k POP2 POP2
+    SWP2k POP2 POP2
+    OVR2k POP2 POP2 POP2
+    
+    POP2 POP2
+}
+
+|0100
+    ( Initialize outer loop counter: 100 -> 0x0064 )
+    #0064 STH2
+
+@outer_loop
+    ( Initialize inner loop counter: 1000 -> 0x03e8 )
+    #03e8 STH2
+
+@inner_loop
+    stack_block
+    stack_block
+    stack_block
+    stack_block
+    stack_block
+
+    ( Decrement inner loop counter on RST )
+    STH2r #0001 SUB2 DUP2 STH2 ORA
+    ;inner_loop JCN2
+
+    ( clean up inner loop counter from RST )
+    POP2r
+
+    ( Decrement outer loop counter on RST )
+    STH2r #0001 SUB2 DUP2 STH2 ORA
+    ;outer_loop JCN2
+
+    ( clean up outer loop counter from RST )
+    POP2r
+
+    ( success: print 'OK' and exit with 00 )
+    #4f #18 DEO #4b #18 DEO
+    #80 #0f DEO
+    BRK

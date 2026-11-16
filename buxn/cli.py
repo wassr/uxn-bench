@@ -43,4 +43,14 @@ def parse_args(args=None):
     undump_parser.add_argument("file", type=str, help="Path to the coredump file")
     undump_parser.add_argument("--verbose", "-v", action="store_true", help="Show full hex dumps")
     
+    # Bench command
+    bench_parser = subparsers.add_parser("bench", help="Run performance benchmarks for interpreters")
+    bench_parser.add_argument("bench_action", nargs="?", choices=["run", "compare", "history"], default="run", help="Action to perform (default: run)")
+    bench_parser.add_argument("--include", "-i", type=str, action="append", help="Include benchmarks matching glob (can be specified multiple times)")
+    bench_parser.add_argument("--exclude", "-e", type=str, action="append", help="Exclude benchmarks matching glob (can be specified multiple times)")
+    bench_parser.add_argument("--interpreter", "-r", type=str, help="Interpreter(s) to benchmark (comma-separated list, e.g. py-min,uxncli)")
+    bench_parser.add_argument("--config", "-c", type=str, default="buxn.json", help="Path to configuration file")
+    bench_parser.add_argument("--runs", "-n", type=int, default=5, help="Number of measurement runs (default: 5)")
+    bench_parser.add_argument("--vs", type=str, default="latest", help="Run to compare against (latest, or JSON file path)")
+
     return parser.parse_args(args)

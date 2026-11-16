@@ -1,4 +1,4 @@
-# python-minimal
+# py-min
 
 A minimal, stdlib-only Uxntal assembler (`asm.py`) and Uxn CPU interpreter
 (`vm.py`, varvara-headless: System + Console only). Built as the first entry
@@ -8,7 +8,7 @@ different interpreter languages/dispatch styles later.
 
 ## Declared capabilities
 
-Registered in `uxn-bench.json` as `python-minimal`:
+Registered in `uxn-bench.json` as `py-min`:
 
 - Assembler: `assembler`, `assembler/jsi`, `assembler/jcn`, `assembler/jmi`,
   `assembler/runes`, `assembler/lambda`
@@ -17,7 +17,7 @@ Registered in `uxn-bench.json` as `python-minimal`:
 
 Verified byte-for-byte against the vendored `uxnasm` across every test under
 `tests/cpu/` and `tests/assembler/` (excluding the ones below), and the full
-`uxn-bench` suite passes 0-fail / appropriately-skipped when `python-minimal`
+`uxn-bench` suite passes 0-fail / appropriately-skipped when `py-min`
 is configured as both assembler and interpreter.
 
 ## Known limitations (intentional, not bugs)
@@ -48,7 +48,7 @@ is configured as both assembler and interpreter.
 
 ## Coredump format
 
-`vm.py --dump-on-halt PATH` writes the v1 binary format described in
-`../../coredump_design.md`: `UXNC` magic, 1-byte version, WST/RST pointers,
-the full 256-byte WST/RST arrays, and the full 64KB RAM — written the instant
-the reset vector's `BRK` is reached, before any process-exit-code handling.
+`vm.py --dump-on-halt PATH` writes the v2 binary format described in
+`../../coredump_design.md`: `UXNC` magic, 1-byte version (2), WST/RST pointers,
+halt reason, exit code, PC, presence flags bitmask, WST/RST arrays, Device I/O page,
+64KB RAM, and cycle counter.

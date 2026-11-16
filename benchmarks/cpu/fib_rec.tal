@@ -1,0 +1,30 @@
+|0100
+    ( compute fib(30) -> 0x001e )
+    #001e
+    ;fib JSR2
+    
+    ( check if result is 832040 % 65536 = 45608 -> 0xb228 )
+    #b228 EQU2
+    ,&success JCN
+    
+    ( failure: print 'FAIL' and exit with 01 )
+    #46 #18 DEO #41 #18 DEO #49 #18 DEO #4c #18 DEO
+    #01 #0f DEO
+    BRK
+
+&success
+    ( success: print 'OK' and exit with 00 )
+    #4f #18 DEO #4b #18 DEO
+    #80 #0f DEO
+    BRK
+
+@fib ( n* -- fib_n* )
+    DUP2 #0002 LTH2 ,&is_less JCN
+    ( else: recurse )
+    DUP2 #0001 SUB2 ;fib JSR2
+    SWP2 #0002 SUB2 ;fib JSR2
+    ADD2
+    JMP2r
+
+    &is_less
+    JMP2r

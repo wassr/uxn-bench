@@ -4,7 +4,7 @@ from buxn.verifier import parse_coredump, Verifier
 from buxn.discovery import TestNode
 
 class TestVerifier(unittest.TestCase):
-    def test_parse_coredump_valid(self):
+    def test_parse_coredump_valid_v1(self):
         magic = b"UXNC"
         version = bytes([1])
         wst_ptr = bytes([3])
@@ -16,8 +16,35 @@ class TestVerifier(unittest.TestCase):
         data = magic + version + wst_ptr + rst_ptr + wst_data + rst_data + ram_data
         
         parsed = parse_coredump(data)
+        self.assertEqual(parsed["version"], 1)
         self.assertEqual(parsed["wst_ptr"], 3)
         self.assertEqual(parsed["rst_ptr"], 0)
+        self.assertEqual(parsed["wst"], wst_data)
+        self.assertEqual(parsed["rst"], rst_data)
+        self.assertEqual(parsed["ram"], ram_data)
+
+    def test_parse_coredump_valid_v2(self):
+        header = bytearray(16)
+        header[0:4] = b"UXNC"
+        header[4] = 2
+        header[5] = 3
+        header[6] = 1
+        header[7] = 0  # halt_reason
+        header[8] = 0  # exit_code
+        header[9:11] = (0x0120).to_bytes(2, "big")  # pc
+        header[12:14] = (0x0001 | 0x0002 | 0x0008).to_bytes(2, "big")  # WST, RST, RAM
+
+        wst_data = bytes([i % 256 for i in range(256)])
+        rst_data = bytes([0] * 256)
+        ram_data = bytes([0] * 65536)
+
+        data = bytes(header) + wst_data + rst_data + ram_data
+        parsed = parse_coredump(data)
+
+        self.assertEqual(parsed["version"], 2)
+        self.assertEqual(parsed["wst_ptr"], 3)
+        self.assertEqual(parsed["rst_ptr"], 1)
+        self.assertEqual(parsed["pc"], 0x0120)
         self.assertEqual(parsed["wst"], wst_data)
         self.assertEqual(parsed["rst"], rst_data)
         self.assertEqual(parsed["ram"], ram_data)

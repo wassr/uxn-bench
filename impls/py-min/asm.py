@@ -111,7 +111,7 @@ class Assembler:
         return addr
 
     def resolve_name(self, raw_name: str) -> str:
-        if raw_name.startswith("&"):
+        if raw_name.startswith("&") or raw_name.startswith("/"):
             return f"{self.scope}/{raw_name[1:]}"
         return raw_name
 
@@ -128,8 +128,6 @@ class Assembler:
         return f"__anon{self.anon_counter}"
 
     def _parse_pad_operand(self, operand: str) -> int:
-        # assembler/pad-label (`|label` / `$label` with a label operand) is
-        # not implemented -- only raw hex padding operands are supported.
         try:
             return parse_hex(operand)
         except ValueError:
@@ -138,7 +136,7 @@ class Assembler:
     def assemble(self, source: str) -> None:
         tokens = tokenize(source)
         queue = list(tokens)
-        queue.reverse()  # use as a stack: pop from the end
+        queue.reverse()
 
         def next_token():
             return queue.pop() if queue else None
@@ -168,7 +166,7 @@ class Assembler:
             tok = next_token()
             if tok is None:
                 break
-            if isinstance(tok, tuple):  # macro-expansion-end sentinel
+            if isinstance(tok, tuple):
                 self.expanding.discard(tok[1])
                 continue
             self._process_token(tok, next_token, push_tokens, collect_braced_body)
@@ -186,13 +184,17 @@ class Assembler:
             return
         if c == "@":
             name = tok[1:]
+            if name.startswith("&") or name.startswith("/"):
+                name = self.resolve_name(name)
+            else:
+                self.scope = name.split("/", 1)[0]
             self.define_label(name)
-            self.scope = name.split("/", 1)[0]
             return
         if c == "&":
             name = self.resolve_name(tok)
             self.define_label(name)
             return
+
         if tok == "}":
             if not self.anon_stack:
                 raise AssemblerError("Unmatched '}'")

@@ -1,0 +1,38 @@
+|0000
+@loop_counter $2
+@src $2
+@dst $2
+@bytes_left $2
+
+|0100
+    ( Initialize loop counter: 100 -> 0x0064 )
+    #0064 .loop_counter STZ2
+
+@copy_loop
+    ( Initialize src, dst, bytes_left )
+    #4000 .src STZ2
+    #8000 .dst STZ2
+    #1000 .bytes_left STZ2 ( 4096 bytes )
+
+@block_loop
+    .src LDZ2 LDA
+    .dst LDZ2 STA
+
+    ( increment src and dst )
+    .src LDZ2 #0001 ADD2 .src STZ2
+    .dst LDZ2 #0001 ADD2 .dst STZ2
+
+    ( decrement bytes_left )
+    .bytes_left LDZ2 #0001 SUB2 DUP2 .bytes_left STZ2
+    #0000 NEQ2
+    ,block_loop JCN
+
+    ( decrement loop_counter )
+    .loop_counter LDZ2 #0001 SUB2 DUP2 .loop_counter STZ2
+    #0000 NEQ2
+    ,copy_loop JCN
+
+    ( success: print 'OK' and exit )
+    #4f #18 DEO #4b #18 DEO
+    #80 #0f DEO
+    BRK

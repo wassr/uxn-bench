@@ -1,0 +1,83 @@
+|0000
+@i $2
+
+|0100
+    #0001 .i STZ2
+
+@loop
+    ( check i % 15 == 0 )
+    .i LDZ2 DUP2 #000f DIV2 #000f MUL2 SUB2 #0000 EQU2 ,&fizzbuzz JCN
+    
+    ( check i % 3 == 0 )
+    .i LDZ2 DUP2 #0003 DIV2 #0003 MUL2 SUB2 #0000 EQU2 ,&fizz JCN
+
+    ( check i % 5 == 0 )
+    .i LDZ2 DUP2 #0005 DIV2 #0005 MUL2 SUB2 #0000 EQU2 ,&buzz JCN
+
+    ( print i )
+    .i LDZ2 ;print_dec JSR2
+    #0a #18 DEO
+    ;continue JMP2
+
+&fizzbuzz
+    ( print 'FizzBuzz\n' )
+    #46 #18 DEO #69 #18 DEO #7a #18 DEO #7a #18 DEO
+    #42 #18 DEO #75 #18 DEO #7a #18 DEO #7a #18 DEO
+    #0a #18 DEO
+    ;continue JMP2
+
+&fizz
+    ( print 'Fizz\n' )
+    #46 #18 DEO #69 #18 DEO #7a #18 DEO #7a #18 DEO
+    #0a #18 DEO
+    ;continue JMP2
+
+&buzz
+    ( print 'Buzz\n' )
+    #42 #18 DEO #75 #18 DEO #7a #18 DEO #7a #18 DEO
+    #0a #18 DEO
+    ;continue JMP2
+
+@continue
+    .i LDZ2 #0001 ADD2 DUP2 .i STZ2
+    #07d1 NEQ2
+    ;loop JCN2
+
+    ( success: print 'OK' )
+    #4f #18 DEO #4b #18 DEO #0a #18 DEO
+    ( exit )
+    #80 #0f DEO
+    BRK
+
+@print_dec ( val* -- )
+    ( If val == 0, print '0' )
+    DUP2 #0000 EQU2 ,&zero JCN
+    
+    ( Push sentinel: 0xffff )
+    #ffff SWP2
+
+&loop_dec
+    DUP2 #0000 EQU2 ,&print JCN
+    DUP2 #000a DIV2
+    DUP2 #000a MUL2
+    ROT2 SWP2 SUB2
+    SWP2
+    ;&loop_dec JMP2
+
+&print
+    POP2
+&print_loop
+    DUP2 #ffff EQU2 ,&end JCN
+    #0030 ADD2
+    NIP
+    #18 DEO
+    ;&print_loop JMP2
+
+&end
+    POP2
+    JMP2r
+
+&zero
+    POP2
+    #30 #18 DEO
+    JMP2r

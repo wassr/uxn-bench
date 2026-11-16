@@ -19,7 +19,7 @@ _covered_lines = set()
 def _trace_vm(frame, event, arg):
     if event == 'line':
         filename = frame.f_code.co_filename
-        if "python-minimal" in filename:
+        if "py-min" in filename:
             base = os.path.basename(filename)
             if base in ("vm.py", "devices.py"):
                 _covered_lines.add((base, frame.f_lineno))
@@ -45,7 +45,14 @@ MASK8 = 0xff
 MASK16 = 0xffff
 
 COREDUMP_MAGIC = b"UXNC"
-COREDUMP_VERSION = 1
+COREDUMP_VERSION = 2
+
+FLAG_WST = 0x0001
+FLAG_RST = 0x0002
+FLAG_DEV = 0x0004
+FLAG_RAM = 0x0008
+FLAG_CYCLES = 0x0010
+FLAG_BANKS = 0x0020
 
 
 def signed8(b: int) -> int:
@@ -98,6 +105,9 @@ class Uxn:
         self.wst = Stack()
         self.rst = Stack()
         self.devices = Devices(self.wst, self.rst)
+        self.pc = 0x0100
+        self.cycles = 0
+        self.halt_reason = 0  # 0=BRK, 1=System Exit
 
     def load_rom(self, rom: bytes) -> None:
         self.ram[0x0100:0x0100 + len(rom)] = rom
@@ -133,13 +143,23 @@ class Uxn:
             self.devices.deo(port & MASK8, value & MASK8)
 
     def run(self) -> None:
-        pc = 0x0100
+        self.pc = 0x0100
         while True:
-            instr = self.ram[pc]
-            pc = (pc + 1) & MASK16
-            if instr == 0x00:
+            if self.devices.halted:
+                self.halt_reason = 1
                 break
-            pc = self._exec(instr, pc)
+            instr = self.ram[self.pc]
+            prev_pc = self.pc
+            self.pc = (self.pc + 1) & MASK16
+            self.cycles += 1
+            if instr == 0x00:
+                self.pc = prev_pc
+                self.halt_reason = 0
+                break
+            self.pc = self._exec(instr, self.pc)
+            if self.devices.halted:
+                self.halt_reason = 1
+                break
 
     def _exec(self, instr: int, pc: int) -> int:
         base = instr & 0x1f
@@ -160,35 +180,35 @@ class Uxn:
         elif base == 0x02:  # POP
             if not keep:
                 src.pop(short)
-        elif base == 0x03:  # NIP
+        elif base == 0x03:  # DUP
+            a = src.peek(0, short) if keep else src.pop(short)
+            src.push(a, short)
+            src.push(a, short)
+        elif base == 0x04:  # NIP
             if keep:
                 b = src.peek(0, short)
-                src.peek(1, short)  # 'a' just read, not removed
+                src.peek(1, short)
             else:
                 b = src.pop(short)
-                src.pop(short)  # discard 'a'
+                src.pop(short)
             src.push(b, short)
-        elif base == 0x04:  # SWP
+        elif base == 0x05:  # SWP
             b = src.peek(0, short) if keep else src.pop(short)
             a = src.peek(1, short) if keep else src.pop(short)
             src.push(b, short)
             src.push(a, short)
-        elif base == 0x05:  # ROT
+        elif base == 0x06:  # OVR
+            b = src.peek(0, short) if keep else src.pop(short)
+            a = src.peek(1, short) if keep else src.pop(short)
+            src.push(a, short)
+            src.push(b, short)
+            src.push(a, short)
+        elif base == 0x07:  # ROT
             c = src.peek(0, short) if keep else src.pop(short)
             b = src.peek(1, short) if keep else src.pop(short)
             a = src.peek(2, short) if keep else src.pop(short)
             src.push(b, short)
             src.push(c, short)
-            src.push(a, short)
-        elif base == 0x06:  # DUP
-            a = src.peek(0, short) if keep else src.pop(short)
-            src.push(a, short)
-            src.push(a, short)
-        elif base == 0x07:  # OVR
-            b = src.peek(0, short) if keep else src.pop(short)
-            a = src.peek(1, short) if keep else src.pop(short)
-            src.push(a, short)
-            src.push(b, short)
             src.push(a, short)
         elif base in (0x08, 0x09, 0x0a, 0x0b):  # EQU, NEQ, GTH, LTH
             b = src.peek(0, short) if keep else src.pop(short)
@@ -323,12 +343,26 @@ class Uxn:
 
 
 def write_coredump(path: str, vm: Uxn) -> None:
+    flags = FLAG_WST | FLAG_RST | FLAG_DEV | FLAG_RAM | FLAG_CYCLES
+    header = bytearray(16)
+    header[0:4] = COREDUMP_MAGIC
+    header[4] = COREDUMP_VERSION
+    header[5] = vm.wst.ptr
+    header[6] = vm.rst.ptr
+    header[7] = vm.halt_reason
+    header[8] = vm.devices.exit_code
+    header[9:11] = vm.pc.to_bytes(2, "big")
+    header[11] = 0  # Bank Count
+    header[12:14] = flags.to_bytes(2, "big")
+    header[14:16] = b"\x00\x00"
+
     with open(path, "wb") as f:
-        f.write(COREDUMP_MAGIC)
-        f.write(bytes([COREDUMP_VERSION, vm.wst.ptr, vm.rst.ptr]))
+        f.write(header)
         f.write(vm.wst.data)
         f.write(vm.rst.data)
+        f.write(vm.devices.page)
         f.write(vm.ram)
+        f.write(vm.cycles.to_bytes(8, "big"))
 
 
 def main() -> int:

@@ -1,0 +1,90 @@
+|0000
+@seed $1
+@i $2
+@j $2
+@addr $2
+@temp_j $1
+@temp_j1 $1
+
+|0100
+    ( Initialize seed to 0x5a )
+    #5a .seed STZ
+    ( Initialize i to 0x0000 )
+    #0000 .i STZ2
+
+@fill_loop
+    ( seed = seed * 109 + 89 )
+    .seed LDZ #6d MUL #59 ADD .seed STZ
+    
+    ( arr[i] = seed )
+    .seed LDZ
+    #2000 .i LDZ2 ADD2
+    STA
+    
+    ( i++ )
+    .i LDZ2 #0001 ADD2 DUP2 .i STZ2
+    #0800 NEQ2
+    ,fill_loop JCN
+
+    ( Run Bubble Sort )
+    #0000 .i STZ2
+
+@outer_loop
+    #0000 .j STZ2
+
+@inner_loop
+    ( read arr[j] )
+    #2000 .j LDZ2 ADD2 DUP2 .addr STZ2
+    LDA .temp_j STZ
+    
+    ( read arr[j+1] )
+    .addr LDZ2 #0001 ADD2 LDA .temp_j1 STZ
+    
+    ( compare )
+    .temp_j LDZ .temp_j1 LDZ GTH
+    ,swap JCN
+
+@continue_inner
+    ( j++ )
+    .j LDZ2 #0001 ADD2 DUP2 .j STZ2
+    #07ff NEQ2
+    ,inner_loop JCN
+
+    ( i++ )
+    .i LDZ2 #0001 ADD2 DUP2 .i STZ2
+    #07ff NEQ2
+    ,outer_loop JCN
+
+    ( Verify that array is sorted )
+    #0000 .i STZ2
+
+@verify_loop
+    .i LDZ2 #07fe EQU2
+    ,ok_skip JCN
+    
+    ( read arr[i] )
+    #2000 .i LDZ2 ADD2 LDA
+    ( read arr[i+1] )
+    #2000 .i LDZ2 ADD2 #0001 ADD2 LDA
+    GTH
+    ,&fail JCN
+    
+    .i LDZ2 #0001 ADD2 DUP2 .i STZ2
+    ,verify_loop JCN
+
+&fail
+    ( failure! print 'FAIL' and exit )
+    #46 #18 DEO #41 #18 DEO #49 #18 DEO #4c #18 DEO
+    #01 #0f DEO
+    BRK
+
+@ok_skip
+    ( success! print 'OK' and exit )
+    #4f #18 DEO #4b #18 DEO
+    #80 #0f DEO
+    BRK
+
+@swap
+    .temp_j1 LDZ .addr LDZ2 STA
+    .temp_j LDZ .addr LDZ2 #0001 ADD2 STA
+    ;continue_inner JMP2

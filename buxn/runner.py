@@ -115,3 +115,145 @@ class Runner:
             output_files=output_files,
             duration_ms=duration_ms
         )
+
+    def run_benchmark(self, bench: TestNode, int_tool_name: str, runs: int = 5, timeout: float = 10.0) -> dict:
+        import os
+        import statistics
+        import math
+
+        # Stage 1: Write empty.tal & compile empty.rom to compute baseline process overhead
+        empty_tal_path = BUXN_TMP_DIR / "empty.tal"
+        empty_rom_path = BUXN_TMP_DIR / "empty.rom"
+        with open(empty_tal_path, "w") as f:
+            f.write("|0100 #80 #0f DEO\n")
+
+        asm_tool_name = self.config.get("defaults", {}).get("assembler", "uxnasm")
+        asm_spec = self._tool_spec("assemblers", asm_tool_name)
+        asm_cmd_template = asm_spec.get("cmd", f"{asm_tool_name} {{input}} {{output}}")
+
+        # Compile empty.rom
+        cmd_asm_empty = self._build_argv(asm_tool_name, asm_cmd_template, {
+            "input": empty_tal_path,
+            "output": empty_rom_path,
+        })
+        subprocess.run(cmd_asm_empty, capture_output=True, check=True)
+
+        # Assemble the benchmark ROM
+        bench_tmp_dir = BUXN_TMP_DIR / "benchmarks" / bench.id
+        bench_tmp_dir.mkdir(parents=True, exist_ok=True)
+        bench_input = bench.path.parent / bench.config.get("run", {}).get("input", "")
+        bench_rom = bench_tmp_dir / "out.rom"
+
+        cmd_asm_bench = self._build_argv(asm_tool_name, asm_cmd_template, {
+            "input": bench_input,
+            "output": bench_rom,
+        })
+        subprocess.run(cmd_asm_bench, capture_output=True, check=True)
+
+        # Get interpreter spec
+        int_spec = self._tool_spec("interpreters", int_tool_name)
+        int_cmd_template = int_spec.get("cmd", f"{int_tool_name} {{rom}}")
+        supports_coredump = "cpu/coredump" in int_spec.get("capabilities", [])
+        dump_file = bench_tmp_dir / "core.dump"
+        dump_file.unlink(missing_ok=True)
+
+        # Measure baseline process overhead by running empty.rom N=5 times
+        cmd_empty = self._build_argv(int_tool_name, int_cmd_template, {
+            "rom": empty_rom_path,
+            "dump_file": "",
+        })
+
+        overhead_runs = []
+        for _ in range(5):
+            t_start = time.perf_counter()
+            subprocess.run(cmd_empty, capture_output=True, timeout=timeout)
+            t_end = time.perf_counter()
+            overhead_runs.append((t_end - t_start) * 1000.0)  # ms
+
+        overhead_median = statistics.median(overhead_runs)
+
+        # Build runner command for the benchmark
+        cmd_bench = self._build_argv(int_tool_name, int_cmd_template, {
+            "rom": bench_rom,
+            "dump_file": dump_file if supports_coredump else "",
+        })
+        stdin_data = bench.config.get("run", {}).get("stdin")
+
+        # 1. Cold Start Run (first warm-up run)
+        t_start = time.perf_counter()
+        res_cold = subprocess.run(cmd_bench, input=stdin_data, capture_output=True, text=True, timeout=timeout)
+        t_end = time.perf_counter()
+        cold_start_raw = (t_end - t_start) * 1000.0
+        cold_start_adjusted = max(0.0, cold_start_raw - overhead_median)
+
+        # 2. Additional Warm-up Run
+        subprocess.run(cmd_bench, input=stdin_data, capture_output=True, timeout=timeout)
+
+        # 3. Measurement Runs (runs)
+        warm_runs_raw = []
+        last_res = None
+        for _ in range(runs):
+            t_start = time.perf_counter()
+            last_res = subprocess.run(cmd_bench, input=stdin_data, capture_output=True, text=True, timeout=timeout)
+            t_end = time.perf_counter()
+            warm_runs_raw.append((t_end - t_start) * 1000.0)
+
+        warm_runs_adjusted = [max(0.0, r - overhead_median) for r in warm_runs_raw]
+
+        # Verify correctness using the output of the last run
+        exec_res = ExecutionResult(
+            returncode=last_res.returncode,
+            stdout=last_res.stdout,
+            stderr=last_res.stderr,
+            output_files={"rom": bench_rom, "coredump": dump_file} if dump_file.exists() else {"rom": bench_rom},
+            duration_ms=warm_runs_raw[-1]
+        )
+
+        from .verifier import Verifier
+        verifier = Verifier()
+        verify_res = verifier.verify(bench, exec_res)
+
+        # Compute statistics
+        def stats(runs_list):
+            if not runs_list:
+                return 0.0, 0.0, 0.0, 0.0, 0.0
+            avg_val = sum(runs_list) / len(runs_list)
+            median_val = statistics.median(runs_list)
+            min_val = min(runs_list)
+            max_val = max(runs_list)
+            variance = sum((x - avg_val) ** 2 for x in runs_list) / len(runs_list)
+            stddev = math.sqrt(variance)
+            return avg_val, median_val, min_val, max_val, stddev
+
+        avg_raw, median_raw, min_raw, max_raw, stddev_raw = stats(warm_runs_raw)
+        avg_adj, median_adj, min_adj, max_adj, stddev_adj = stats(warm_runs_adjusted)
+
+        # Clean up temp empty ROM files
+        empty_tal_path.unlink(missing_ok=True)
+        empty_rom_path.unlink(missing_ok=True)
+
+        return {
+            "benchmark": bench.id,
+            "benchmark_revision": bench.config.get("revision", 1),
+            "interpreter": int_tool_name,
+            "interpreter_version": int_spec.get("version", "unknown"),
+            "verified": verify_res.passed,
+            "overhead_ms": overhead_median,
+            "overhead_runs": [round(x, 2) for x in overhead_runs],
+            "cold_start_raw_ms": round(cold_start_raw, 2),
+            "cold_start_adjusted_ms": round(cold_start_adjusted, 2),
+            "warm_runs_raw_ms": [round(x, 2) for x in warm_runs_raw],
+            "warm_runs_adjusted_ms": [round(x, 2) for x in warm_runs_adjusted],
+            "avg_warm_raw_ms": round(avg_raw, 2),
+            "avg_warm_adjusted_ms": round(avg_adj, 2),
+            "median_warm_raw_ms": round(median_raw, 2),
+            "median_warm_adjusted_ms": round(median_adj, 2),
+            "min_warm_raw_ms": round(min_raw, 2),
+            "min_warm_adjusted_ms": round(min_adj, 2),
+            "max_warm_raw_ms": round(max_raw, 2),
+            "max_warm_adjusted_ms": round(max_adj, 2),
+            "stddev_ms": round(stddev_adj, 2),
+            "stdout": last_res.stdout,
+            "stderr": last_res.stderr,
+            "returncode": last_res.returncode
+        }

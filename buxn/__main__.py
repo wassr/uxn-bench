@@ -36,6 +36,22 @@ def main():
         _run_run_command(args)
         sys.exit(0)
     
+    if args.command == "bench":
+        from .benchmark import run_benchmarks, compare_benchmarks, show_history
+        config_path = getattr(args, "config", "buxn.json")
+        config = load_config(config_path)
+        if not config:
+            logger.error("No valid configuration found. Exiting.")
+            sys.exit(1)
+            
+        if args.bench_action == "run":
+            run_benchmarks(args, config)
+        elif args.bench_action == "compare":
+            compare_benchmarks(args, config)
+        elif args.bench_action == "history":
+            show_history(args, config)
+        sys.exit(0)
+    
     # Default behavior for 'test' or no command specified
     config_path = getattr(args, "config", "buxn.json")
     

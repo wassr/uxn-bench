@@ -18,7 +18,7 @@
         }
       },
       {
-        "cmd": "git show origin/main:archive/uxnasm.c > uxnasm_modern.c && cc uxnasm_modern.c -o bin/uxnasm",
+        "cmd": "cc src/uxnasm.c -o bin/uxnasm",
         "bins": {
           "bin/uxnasm": "uxnasm"
         }
@@ -48,6 +48,19 @@
         "bins": {
           "bin/drifblim.rom": "drifblim.rom",
           "bin/drifblim": "drifblim"
+        }
+      }
+    ]
+  },
+  "go-min": {
+    "enabled": true,
+    "requires": ["go"],
+    "repo": "",
+    "build_steps": [
+      {
+        "cmd": "go build -o bin/go-min ../../../impls/go-min/main.go",
+        "bins": {
+          "bin/go-min": "go-min"
         }
       }
     ]

@@ -25,10 +25,16 @@ def parse_coredump(data: bytes) -> dict:
     """
     state = _parse_coredump(data)
     return {
+        "version": state.version,
         "wst_ptr": state.wst_ptr,
         "rst_ptr": state.rst_ptr,
+        "halt_reason": state.halt_reason,
+        "exit_code": state.exit_code,
+        "pc": state.pc,
+        "cycles": state.cycles,
         "wst": state.wst,
         "rst": state.rst,
+        "dev": state.dev,
         "ram": state.ram,
     }
 
